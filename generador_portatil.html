@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Portátil PUNTOPLATA</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #1e293b;
+            --accent: #10b981;
+            --text-main: #334155;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--primary);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            background-color: #f8fafc;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #0f172a;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background-color: #ecfdf5;
+            border: 2px dashed var(--accent);
+            border-radius: 0.75rem;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .key-display {
+            font-family: monospace;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #047857;
+            word-break: break-all;
+            margin: 0.5rem 0;
+            user-select: all;
+        }
+
+        .copy-btn {
+            background-color: var(--accent);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background-color: #059669;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Generador Maestro</h1>
+            <p>PUNTOPLATA / Licencias Locales</p>
+        </div>
+
+        <div class="form-group">
+            <label for="masterSalt">Sal Secreta (Master Key)</label>
+            <input type="password" id="masterSalt" placeholder="Ingresa la llave maestra del sistema"
+                autocomplete="off">
+            <div id="saltError" class="error">La sal secreta no coincide.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="businessName">Nombre del Negocio (Exacto)</label>
+            <input type="text" id="businessName" placeholder="Ej: Joyería Mari" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="licenseType">Tipo de Licencia</label>
+            <select id="licenseType">
+                <option value="mensual">Mensual (30 días)</option>
+                <option value="vitalicia">Vitalicia (Para siempre)</option>
+            </select>
+        </div>
+
+        <button onclick="generateKey()">Generar Llave</button>
+
+        <div id="resultBox" class="result-box">
+            <div style="font-size: 0.875rem; color: #065f46; font-weight: 600;">Llave Generada:</div>
+            <div id="keyDisplay" class="key-display"></div>
+            <div id="keyDetails" style="font-size: 0.75rem; margin-bottom: 10px; color: #065f46;"></div>
+            <button class="copy-btn" onclick="copyKey()">Copiar al Portapapeles</button>
+        </div>
+    </div>
+
+    <script>
+        // HASHEO SIMPLE - Debe ser idéntico al de security.ts
+        function createHash(str) {
+            let hash = 0;
+            for (let i = 0, len = str.length; i < len; i++) {
+                let chr = str.charCodeAt(i);
+                hash = (hash << 5) - hash + chr;
+                hash |= 0;
+            }
+            return Math.abs(hash);
+        }
+
+        function generateKey() {
+            const saltInput = document.getElementById('masterSalt').value;
+            const businessName = document.getElementById('businessName').value;
+            const type = document.getElementById('licenseType').value;
+            const errorEl = document.getElementById('saltError');
+            const resultBox = document.getElementById('resultBox');
+
+            // Validación básica: Para mayor seguridad en offline, hardcodeamos
+            // un hash de la sal original (PRISCA925-ELITE-MAKER) = 1145618491
+            // Así no exponemos la contraseña en el archivo tan fácilmente.
+            // Para el demo, la validaremos directo, pero la recomendación 
+            // es guardarla en la cabeza del dueño.
+            const EXPECTED_SALT = "WACHAMONOS-AGRADECIDO1234";
+
+            errorEl.style.display = 'none';
+            resultBox.classList.remove('show');
+
+            if (!saltInput || !businessName) {
+                alert("Por favor llena todos los campos.");
+                return;
+            }
+
+            if (saltInput !== EXPECTED_SALT) {
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const timestamp = Date.now();
+            let expiresAt = undefined;
+            let displayDetails = "Válida: Para siempre";
+
+            if (type === 'mensual') {
+                expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
+                const date = new Date(expiresAt);
+                const formattedDate = date.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                displayDetails = `Expira: ${formattedDate}`;
+            }
+
+            const cleanName = businessName.trim().toUpperCase();
+
+            // Lógica IDÉNTICA a security.ts
+            const dataString = `${cleanName}|${type}|${expiresAt || 'PERM'}|${saltInput}`;
+            const hashSignature = createHash(dataString).toString(16).toUpperCase();
+            const key = `PP-${type === 'vitalicia' ? 'VIT' : 'MES'}-${hashSignature}${expiresAt ? '-' + expiresAt.toString(36).toUpperCase() : ''}`;
+
+            document.getElementById('keyDisplay').innerText = key;
+            document.getElementById('keyDetails').innerText = displayDetails;
+            resultBox.classList.add('show');
+        }
+
+        function copyKey() {
+            const key = document.getElementById('keyDisplay').innerText;
+            navigator.clipboard.writeText(key).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "¡Copiado!";
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
