@@ -142,15 +142,15 @@ export const VentaPage = () => {
         return (
             <div className="flex-1 flex flex-col items-center justify-center h-full bg-slate-50 p-6">
                 <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
-                    <div className="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-20 h-20 bg-olivo-50 text-olivo-500 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="w-10 h-10" />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-800 mb-2">¡Venta Exitosa!</h2>
+                    <h2 className="text-2xl font-bold text-olivo-600 mb-2">¡Venta Exitosa!</h2>
                     <p className="text-slate-500 mb-6">Folio: {ventaExitosa.folio}</p>
 
                     <div className="bg-slate-50 p-4 rounded-xl mb-8">
                         <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Cobrado</p>
-                        <p className="text-3xl font-black text-emerald-600">${ventaExitosa.total.toFixed(2)}</p>
+                        <p className="text-3xl font-black text-[#80854b]">${ventaExitosa.total.toFixed(2)}</p>
                     </div>
 
                     <div className="space-y-3">
@@ -182,12 +182,12 @@ export const VentaPage = () => {
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Carrito de Venta</h1>
                     <div className="flex items-center gap-4">
                         <div className="relative hidden md:block group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#80854b] transition-colors" />
                             <input
                                 ref={searchInputRef}
                                 type="text"
                                 placeholder="Escanear producto..."
-                                className="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none w-48"
+                                className="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none w-48"
                                 onChange={async (e) => {
                                     const val = e.target.value.trim();
                                     if (val.length >= 3) {
@@ -239,17 +239,17 @@ export const VentaPage = () => {
                     <section>
                         <h3 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Vendido a...</h3>
                         {clienteSeleccionado ? (
-                            <div className="p-4 border border-emerald-200 rounded-xl bg-emerald-50 flex items-center justify-between group">
+                            <div className="p-4 border border-[#80854b]/20 rounded-xl bg-[#80854b]/5 flex items-center justify-between group">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center font-bold text-sm">
+                                    <div className="w-8 h-8 bg-[#80854b]/10 text-[#80854b] rounded-lg flex items-center justify-center font-bold text-sm">
                                         {clienteSeleccionado.nombre[0]}
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-sm font-bold text-slate-800 truncate">{clienteSeleccionado.nombre}</p>
-                                        <p className="text-[10px] text-emerald-600 font-medium uppercase">{clienteSeleccionado.tipo_cliente}</p>
+                                        <p className="text-[10px] text-[#80854b] font-medium uppercase">{clienteSeleccionado.tipo_cliente}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setClienteSeleccionado(null)} className="p-1 hover:bg-emerald-100 rounded-md text-emerald-400 transition-colors">
+                                <button onClick={() => setClienteSeleccionado(null)} className="p-1 hover:bg-[#80854b]/10 rounded-md text-[#80854b]/40 transition-colors">
                                     <X className="w-4 h-4" />
                                 </button>
                             </div>
@@ -259,7 +259,7 @@ export const VentaPage = () => {
                                     onClick={() => setShowClienteModal(true)}
                                     className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-center cursor-pointer hover:bg-slate-100 transition-colors border-dashed"
                                 >
-                                    <span className="text-sm font-medium text-emerald-600">🔍 Buscar Cliente</span>
+                                    <span className="text-sm font-medium text-[#80854b]">🔍 Buscar Cliente</span>
                                 </div>
                                 <div
                                     onClick={() => {
@@ -295,7 +295,7 @@ export const VentaPage = () => {
                                     key={metodo.id}
                                     onClick={() => setMetodoPago(metodo.id)}
                                     className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${metodoPago === metodo.id
-                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm'
+                                        ? 'border-[#80854b] bg-[#80854b]/5 text-[#80854b] shadow-sm'
                                         : 'border-slate-100 hover:border-slate-200 bg-white text-slate-600'
                                         }`}
                                 >
@@ -322,7 +322,7 @@ export const VentaPage = () => {
                                                 setCopiado(true);
                                                 setTimeout(() => setCopiado(false), 2000);
                                             }}
-                                            className="p-2 bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-600 rounded-lg transition-colors flex items-center justify-center gap-1 h-9 w-9"
+                                            className="p-2 bg-slate-100 text-slate-600 hover:bg-olivo-100 hover:text-olivo-600 rounded-lg transition-colors flex items-center justify-center gap-1 h-9 w-9"
                                             title="Copiar datos al portapapeles"
                                         >
                                             {copiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -356,7 +356,7 @@ export const VentaPage = () => {
                                 max={isAdmin ? "100" : maxDescuento}
                                 value={descuentoPorcentaje || ''} 
                                 onChange={handleDescuentoChange}
-                                className="w-20 px-3 py-1.5 bg-slate-100 border-none rounded-lg text-right font-bold text-emerald-600 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                className="w-20 px-3 py-1.5 bg-slate-100 border-none rounded-lg text-right font-bold text-[#80854b] focus:ring-2 focus:ring-[#80854b] outline-none"
                                 placeholder="0"
                             />
                             <span className="text-slate-500 font-bold">%</span>
@@ -366,7 +366,7 @@ export const VentaPage = () => {
                     <TotalesVenta subtotal={subtotal} descuento={descuento} total={total} />
 
                     <Button
-                        className="w-full mt-6 h-14 text-lg font-bold shadow-lg shadow-emerald-500/20"
+                        className="w-full mt-6 h-14 text-lg font-bold shadow-lg shadow-[#80854b]/20 bg-[#80854b] hover:bg-[#64683a]"
                         disabled={cartItems.length === 0 || loading}
                         isLoading={loading}
                         onClick={handleConfirmarVenta}
@@ -396,7 +396,7 @@ export const VentaPage = () => {
                                     placeholder="Buscar cliente..."
                                     value={busquedaCliente}
                                     onChange={e => setBusquedaCliente(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
                                 />
                             </div>
                         </div>
@@ -409,7 +409,7 @@ export const VentaPage = () => {
                                         setClienteSeleccionado(c);
                                         setShowClienteModal(false);
                                     }}
-                                    className="p-3 bg-white border border-slate-100 rounded-xl hover:border-emerald-500 cursor-pointer transition-all flex items-center justify-between"
+                                    className="p-3 bg-white border border-slate-100 rounded-xl hover:border-[#80854b] cursor-pointer transition-all flex items-center justify-between"
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center font-bold text-xs uppercase">
@@ -417,13 +417,13 @@ export const VentaPage = () => {
                                         </div>
                                         <span className="text-sm font-bold text-slate-700">{c.nombre}</span>
                                     </div>
-                                    <Check className="w-4 h-4 text-emerald-500 opacity-0 group-hover:opacity-100" />
+                                    <Check className="w-4 h-4 text-[#80854b] opacity-0 group-hover:opacity-100" />
                                 </div>
                             ))}
                             {clientesEncontrados.length === 0 && (
                                 <div className="text-center py-8">
                                     <p className="text-sm text-slate-400">No se encontraron clientes.</p>
-                                    <Button variant="ghost" className="mt-2 text-emerald-600" onClick={() => navigate('/clientes')}>Ir a Directorio</Button>
+                                    <Button variant="ghost" className="mt-2 text-[#80854b]" onClick={() => navigate('/clientes')}>Ir a Directorio</Button>
                                 </div>
                             )}
                         </div>

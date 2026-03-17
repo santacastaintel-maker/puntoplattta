@@ -16,8 +16,8 @@ export const FeaturesPage = () => {
         {
             title: 'Punto de Venta (POS)',
             description: 'Ventas rápidas, carrito inteligente y múltiples métodos de pago.',
-            icon: <ShoppingCart className="w-8 h-8 text-emerald-500" />,
-            color: 'bg-emerald-50'
+            icon: <ShoppingCart className="w-8 h-8 text-olivo-500" />,
+            color: 'bg-olivo-50'
         },
         {
             title: 'Live Sales (Streaming)',
@@ -58,8 +58,8 @@ export const FeaturesPage = () => {
         {
             title: 'Análisis de Ventas',
             description: 'Gráficas de ingresos y reportes de los productos más vendidos.',
-            icon: <BarChart3 className="w-8 h-8 text-emerald-600" />,
-            color: 'bg-emerald-50'
+            icon: <BarChart3 className="w-8 h-8 text-olivo-600" />,
+            color: 'bg-olivo-50'
         }
     ];
 
@@ -67,12 +67,12 @@ export const FeaturesPage = () => {
         <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-12 pb-20">
             {/* Header */}
             <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold tracking-wide uppercase">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-olivo-100 text-olivo-700 rounded-full text-sm font-bold tracking-wide uppercase">
                     <Sparkles className="w-4 h-4" />
                     Tecnología de Vanguardia
                 </div>
                 <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
-                    Funciones de <span className="text-emerald-600 italic">PUNTOPLATA</span>
+                    Funciones de <span className="text-olivo-600 italic">Andrés Montero Joyería</span>
                 </h1>
                 <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
                     Un sistema diseñado específicamente para el mercado de joyería mexicana, enfocado en rapidez, diseño y total independencia.
@@ -84,7 +84,7 @@ export const FeaturesPage = () => {
                 {features.map((feature, idx) => (
                     <div 
                         key={idx} 
-                        className="group p-8 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all duration-300 transform hover:-translate-y-1"
+                        className="group p-8 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-olivo-100 transition-all duration-300 transform hover:-translate-y-1"
                     >
                         <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                             {feature.icon}
@@ -97,12 +97,12 @@ export const FeaturesPage = () => {
 
             {/* Banner Premium */}
             <div className="bg-slate-900 rounded-[2.5rem] p-10 md:p-16 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px]" />
-                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-olivo-500/20 rounded-full blur-[100px]" />
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-olivo-500/10 rounded-full blur-[80px]" />
                 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                     <div className="space-y-6 max-w-xl">
-                        <div className="inline-flex items-center gap-2 text-emerald-400 font-bold tracking-widest uppercase text-xs">
+                        <div className="inline-flex items-center gap-2 text-olivo-400 font-bold tracking-widest uppercase text-xs">
                             <ShieldCheck className="w-4 h-4" />
                             Seguridad de Grado Bancario
                         </div>
@@ -112,7 +112,7 @@ export const FeaturesPage = () => {
                         </p>
                     </div>
                     <div className="flex flex-col items-center gap-4 bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10">
-                        <div className="text-5xl font-black text-emerald-400">100%</div>
+                        <div className="text-5xl font-black text-olivo-400">100%</div>
                         <div className="text-sm font-bold tracking-widest uppercase text-slate-300">Desconectado</div>
                     </div>
                 </div>

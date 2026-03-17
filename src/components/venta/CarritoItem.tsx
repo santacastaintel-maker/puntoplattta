@@ -30,7 +30,7 @@ export const CarritoItem = ({ item, onIncrement, onDecrement, onRemove }: Carrit
                     <h4 className="text-sm font-semibold text-slate-900 leading-tight line-clamp-1">{producto.nombre}</h4>
                     <span className="text-xs text-slate-500 font-mono">{producto.codigo}</span>
                 </div>
-                <div className="text-emerald-600 font-bold text-sm">
+                <div className="text-olivo-600 font-bold text-sm">
                     {formatPrecio(producto.precio)}
                 </div>
             </div>

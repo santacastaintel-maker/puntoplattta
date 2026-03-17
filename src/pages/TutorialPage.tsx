@@ -6,8 +6,8 @@ export const TutorialPage = () => {
         <div className="p-6 md:p-10 max-w-5xl mx-auto">
             <div className="mb-10">
                 <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                    <BookOpen className="w-8 h-8 text-emerald-500" />
-                    Tutorial: Gestión de PUNTOPLATA
+                    <BookOpen className="w-8 h-8 text-olivo-500" />
+                    Tutorial: Gestión de Andrés Montero Joyería
                 </h1>
                 <p className="text-slate-500 mt-2 text-lg">
                     Guía completa para instalar la app a tus clientes, generar sus llaves y realizar cobros seguros.
@@ -18,18 +18,18 @@ export const TutorialPage = () => {
                 {/* Paso 1: Instalación */}
                 <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+                        <div className="w-12 h-12 bg-olivo-100 rounded-xl flex items-center justify-center text-olivo-600">
                             <Smartphone className="w-6 h-6" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-800">1. ¿Cómo Instalar la App?</h2>
                     </div>
                     <div className="prose prose-slate max-w-none ml-16">
-                        <p>PUNTOPLATA funciona como una <strong>PWA (Progressive Web App)</strong>. No necesitas tiendas de aplicaciones ni descargas pesadas.</p>
+                        <p>Esta plataforma funciona como una <strong>PWA (Progressive Web App)</strong>. No necesitas tiendas de aplicaciones ni descargas pesadas.</p>
                         <ol className="list-decimal pl-5 space-y-2 mt-4 text-slate-700 font-medium">
-                            <li>Abre el enlace de tu PUNTOPLATA en el navegador del cliente (Chrome en Android/PC o Safari en iPhone).</li>
+                            <li>Abre el enlace de tu joyería en el navegador del cliente (Chrome en Android/PC o Safari en iPhone).</li>
                             <li>Abre el menú del navegador (tres puntos arriba a la derecha).</li>
                             <li>Selecciona la opción <strong>"Añadir a la pantalla de inicio"</strong> o <strong>"Instalar Aplicación"</strong>.</li>
-                            <li>¡Listo! El icono de PUNTOPLATA aparecerá en su dispositivo como un programa nativo.</li>
+                            <li>¡Listo! El icono de la aplicación aparecerá en su dispositivo como un programa nativo.</li>
                         </ol>
                     </div>
                 </section>
@@ -63,7 +63,7 @@ export const TutorialPage = () => {
                 {/* Paso 3: Proceso de Cobro */}
                 <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                        <div className="w-12 h-12 bg-olivo-100 rounded-xl flex items-center justify-center text-olivo-600">
                             <CreditCard className="w-6 h-6" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-800">3. El Proceso de Cobro Seguro</h2>

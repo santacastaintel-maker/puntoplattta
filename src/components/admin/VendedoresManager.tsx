@@ -128,7 +128,7 @@ export const VendedoresManager = () => {
                 </div>
                 <button
                     onClick={handleOpenNew}
-                    className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
+                    className="px-4 py-2.5 bg-olivo-500 hover:bg-olivo-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
                 >
                     <Plus className="w-4 h-4" /> Agregar Vendedora
                 </button>
@@ -160,7 +160,7 @@ export const VendedoresManager = () => {
                                     <>
                                         <button 
                                             onClick={() => handleEdit(v)}
-                                            className="p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
+                                            className="p-2 text-slate-400 hover:bg-olivo-50 hover:text-olivo-600 rounded-lg transition-colors"
                                             title="Editar y cambiar NIP"
                                         >
                                             <Edit3 className="w-4 h-4" />
@@ -170,7 +170,7 @@ export const VendedoresManager = () => {
                                             className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors text-center ${
                                                 v.activo 
                                                 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' 
-                                                : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                                : 'bg-olivo-50 text-olivo-600 hover:bg-olivo-100'
                                             }`}
                                         >
                                             {v.activo ? 'Desactivar' : 'Activar Acceso'}
@@ -204,7 +204,7 @@ export const VendedoresManager = () => {
                                     type="text"
                                     value={form.nombre}
                                     onChange={e => setForm({ ...form, nombre: e.target.value })}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none"
                                     placeholder="Ej. María López"
                                 />
                             </div>
@@ -231,7 +231,7 @@ export const VendedoresManager = () => {
                                     maxLength={4}
                                     value={form.pin}
                                     onChange={e => setForm({ ...form, pin: e.target.value.replace(/\D/g, '') })}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-center text-xl tracking-[0.5em] font-bold"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none text-center text-xl tracking-[0.5em] font-bold"
                                     placeholder="****"
                                 />
                             </div>
@@ -246,7 +246,7 @@ export const VendedoresManager = () => {
                                         maxLength={4}
                                         value={form.confirmPin}
                                         onChange={e => setForm({ ...form, confirmPin: e.target.value.replace(/\D/g, '') })}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-center text-xl tracking-[0.5em] font-bold"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none text-center text-xl tracking-[0.5em] font-bold"
                                         placeholder="****"
                                     />
                                 </div>

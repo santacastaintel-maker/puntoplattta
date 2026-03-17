@@ -16,7 +16,7 @@ export const METODOS_PAGO: { id: MetodoPago; label: string; icon: string }[] = [
 ];
 
 export const TIPOS_CLIENTE: Record<TipoCliente, { colorClass: string; hex: string; label: string }> = {
-    premium: { colorClass: 'bg-emerald-500', hex: '#10B981', label: 'Premium' },
+    premium: { colorClass: 'bg-olivo-100 text-olivo-700', hex: '#80854b', label: 'Premium' },
     normal: { colorClass: 'bg-amber-500', hex: '#F59E0B', label: 'Normal' },
     conflictivo: { colorClass: 'bg-rose-500', hex: '#EF4444', label: 'Conflictivo' },
 };

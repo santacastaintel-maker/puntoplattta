@@ -111,13 +111,13 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                     <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-slate-800 to-slate-900 -z-0"></div>
 
                     <div className="relative z-10 flex flex-col items-center">
-                        <div className="w-20 h-20 bg-emerald-500 rounded-2xl shadow-lg flex items-center justify-center mb-6 rotate-3">
+                        <div className="w-20 h-20 bg-olivo-500 rounded-2xl shadow-lg flex items-center justify-center mb-6 rotate-3">
                             <KeyRound className="w-10 h-10 text-white -rotate-3" />
                         </div>
 
                         <h1 className="text-2xl font-bold text-slate-900 text-center">Activación Requerida</h1>
                         <p className="text-slate-500 text-center mt-2 mb-8">
-                            PUNTOPLATA requiere una licencia válida para funcionar en este dispositivo.
+                            Andrés Montero Joyería requiere una licencia válida para funcionar en este dispositivo.
                         </p>
 
                         <form onSubmit={handleActivate} className="w-full space-y-5">
@@ -132,7 +132,7 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                                     value={businessName}
                                     onChange={(e) => setBusinessName(e.target.value)}
                                     placeholder="Ej: Joyería Doña Mari"
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 focus:border-olivo-500 outline-none transition-all"
                                     required
                                 />
                             </div>
@@ -143,7 +143,7 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                                     <button 
                                         type="button" 
                                         onClick={handlePasteKey}
-                                        className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-md transition-colors"
+                                        className="text-xs font-bold text-olivo-600 hover:text-olivo-700 flex items-center gap-1 bg-olivo-50 px-2 py-1 rounded-md transition-colors"
                                     >
                                         <ClipboardPaste className="w-3 h-3" /> Pegar
                                     </button>
@@ -158,7 +158,7 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                                     value={licenseKey}
                                     onChange={(e) => setLicenseKey(e.target.value)}
                                     placeholder="PP-MES-XXXX..."
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none font-mono text-sm transition-all"
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 focus:border-olivo-500 outline-none font-mono text-sm transition-all"
                                     required
                                 />
                             </div>
@@ -166,7 +166,7 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                             <div className="h-10 flex items-center justify-center">
                                 {errorMsg && <p className="text-rose-500 text-sm font-medium animate-pulse">{errorMsg}</p>}
                                 {successMsg && (
-                                    <p className="text-emerald-500 text-sm font-medium flex items-center gap-2">
+                                    <p className="text-olivo-500 text-sm font-medium flex items-center gap-2">
                                         <CheckCircle2 className="w-4 h-4" />
                                         {successMsg}
                                     </p>

@@ -286,13 +286,13 @@ export const InventarioManager = () => {
                             placeholder="Buscar por nombre o código..."
                             value={filtro}
                             onChange={e => setFiltro(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
                         />
                     </div>
                     <select
                         value={filtroCat}
                         onChange={e => setFiltroCat(e.target.value)}
-                        className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                        className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
                     >
                         <option value="">Todas las categorías</option>
                         {categorias.map(c => (
@@ -309,7 +309,7 @@ export const InventarioManager = () => {
                     </button>
                     <button
                         onClick={() => setShowBulkUploader(true)}
-                        className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
+                        className="px-4 py-2.5 bg-olivo-500 hover:bg-olivo-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Upload className="w-4 h-4" /> 📸 Fotos Masiva
                     </button>
@@ -327,7 +327,7 @@ export const InventarioManager = () => {
                     <input type="file" ref={excelInputRef} className="hidden" accept=".xlsx, .xls, .csv" onChange={handleExcelImport} />
                     <button
                         onClick={handleOpenNew}
-                        className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
+                        className="px-4 py-2.5 bg-[#80854b] hover:bg-[#64683a] text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Plus className="w-4 h-4" /> Nuevo Producto
                     </button>
@@ -349,11 +349,11 @@ export const InventarioManager = () => {
                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Productos visibles</p>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                    <p className="text-2xl font-black text-emerald-600">{categorias.length}</p>
+                    <p className="text-2xl font-black text-[#80854b]">{categorias.length}</p>
                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Categorías</p>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                    <p className="text-2xl font-black text-blue-600">{productos.reduce((s, p) => s + p.stock, 0)}</p>
+                    <p className="text-2xl font-black text-olivo-600">{productos.reduce((s, p) => s + p.stock, 0)}</p>
                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Piezas en Stock</p>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
@@ -370,7 +370,7 @@ export const InventarioManager = () => {
                     <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-slate-700">Sin productos todavía</h3>
                     <p className="text-slate-500 text-sm mt-1 mb-4">Haz clic en "Nuevo Producto" para añadir tu primera joya.</p>
-                    <button onClick={handleOpenNew} className="px-6 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors">
+                    <button onClick={handleOpenNew} className="px-6 py-2.5 bg-[#80854b] text-white rounded-xl font-bold text-sm hover:bg-[#64683a] transition-colors">
                         <Plus className="w-4 h-4 inline mr-1" /> Agregar
                     </button>
                 </div>
@@ -389,7 +389,7 @@ export const InventarioManager = () => {
                                 )}
                                 {/* Actions overlay */}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                    <button onClick={() => handleEdit(p)} className="p-2.5 bg-white rounded-full text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors shadow-lg">
+                                    <button onClick={() => handleEdit(p)} className="p-2.5 bg-white rounded-full text-slate-700 hover:bg-[#80854b]/10 hover:text-[#80854b] transition-colors shadow-lg">
                                         <Edit3 className="w-4 h-4" />
                                     </button>
                                     <button onClick={() => handleDelete(p.id)} className="p-2.5 bg-white rounded-full text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors shadow-lg">
@@ -399,7 +399,7 @@ export const InventarioManager = () => {
                                 {/* Stock badge */}
                                 <div className={cn(
                                     "absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold",
-                                    p.stock > 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                                    p.stock > 0 ? "bg-[#80854b]/10 text-[#80854b]" : "bg-rose-100 text-rose-700"
                                 )}>
                                     {p.stock > 0 ? `${p.stock} pzas` : 'Agotado'}
                                 </div>
@@ -423,7 +423,7 @@ export const InventarioManager = () => {
                                 <p className="text-xs font-mono text-slate-400 mb-1">{p.codigo}</p>
                                 <h4 className="font-bold text-slate-800 truncate">{p.nombre}</h4>
                                 <p className="text-xs text-slate-500 mt-0.5">{getCategoryName(p.categoria_id)}</p>
-                                <p className="text-lg font-black text-emerald-600 mt-2">${p.precio.toFixed(2)}</p>
+                                <p className="text-lg font-black text-[#80854b] mt-2">${p.precio.toFixed(2)}</p>
                             </div>
                         </div>
                     ))}
@@ -443,7 +443,7 @@ export const InventarioManager = () => {
                             {/* Image preview + upload */}
                             <div className="flex items-center gap-4">
                                 <div
-                                    className="w-24 h-24 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-emerald-400 transition-colors"
+                                    className="w-24 h-24 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-[#80854b] transition-colors"
                                     onClick={() => fileInputRef.current?.click()}
                                 >
                                     {form.foto_url ? (
@@ -455,7 +455,7 @@ export const InventarioManager = () => {
                                 <div className="flex-1">
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
+                                        className="text-sm font-semibold text-[#80854b] hover:text-[#64683a]"
                                     >
                                         {form.foto_url ? 'Cambiar Imagen' : 'Subir Imagen'}
                                     </button>
@@ -471,7 +471,7 @@ export const InventarioManager = () => {
                                     type="text"
                                     value={form.codigo}
                                     onChange={e => setForm({ ...form, codigo: e.target.value })}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-mono"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm font-mono"
                                     placeholder="PP-001"
                                 />
                             </div>
@@ -483,7 +483,7 @@ export const InventarioManager = () => {
                                     type="text"
                                     value={form.nombre}
                                     onChange={e => setForm({ ...form, nombre: e.target.value })}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm"
                                     placeholder="Anillo de Plata 925 con Zirconia"
                                 />
                             </div>
@@ -495,7 +495,7 @@ export const InventarioManager = () => {
                                     value={form.descripcion}
                                     onChange={e => setForm({ ...form, descripcion: e.target.value })}
                                     rows={2}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm resize-none"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm resize-none"
                                     placeholder="Descripción breve..."
                                 />
                             </div>
@@ -506,7 +506,7 @@ export const InventarioManager = () => {
                                 <select
                                     value={form.categoria_id}
                                     onChange={e => setForm({ ...form, categoria_id: e.target.value })}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm"
                                 >
                                     <option value="">Seleccionar...</option>
                                     {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
@@ -527,7 +527,7 @@ export const InventarioManager = () => {
                                             const val = e.target.value;
                                             setForm({ ...form, precio: parseFloat(val) || 0 });
                                         }}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-bold text-slate-800"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm font-bold text-slate-800"
                                     />
                                 </div>
                                 <div>
@@ -541,7 +541,7 @@ export const InventarioManager = () => {
                                             const val = e.target.value;
                                             setForm({ ...form, stock: parseInt(val) || 0 });
                                         }}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-bold text-slate-800"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm font-bold text-slate-800"
                                     />
                                 </div>
                             </div>
@@ -560,7 +560,7 @@ export const InventarioManager = () => {
                             </button>
                             <button
                                 onClick={handleSave}
-                                className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+                                className="flex-1 py-3 bg-[#80854b] hover:bg-[#64683a] text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
                             >
                                 <Save className="w-4 h-4" />
                                 {editingId ? 'Guardar Cambios' : 'Crear Producto'}
@@ -601,10 +601,10 @@ export const InventarioManager = () => {
                                     value={newCatName}
                                     onChange={e => setNewCatName(e.target.value)}
                                     placeholder="Nueva categoría..."
-                                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
                                     onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
                                 />
-                                <button onClick={handleAddCategory} className="px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors">
+                                <button onClick={handleAddCategory} className="px-4 py-2.5 bg-[#80854b] text-white rounded-xl font-bold text-sm hover:bg-[#64683a] transition-colors">
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>

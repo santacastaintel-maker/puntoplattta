@@ -89,24 +89,24 @@ export const EstadisticasViewer = () => {
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Ingresos Hoy */}
-                <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                <div className="bg-olivo-50 rounded-2xl p-6 border border-olivo-100 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-olivo-100 text-olivo-600 rounded-full flex items-center justify-center shrink-0">
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-emerald-800 mb-1">Ingresos Hoy</p>
-                        <p className="text-2xl font-black text-emerald-700">${stats.ingresosHoy.toFixed(2)}</p>
+                        <p className="text-sm font-bold text-olivo-800 mb-1">Ingresos Hoy</p>
+                        <p className="text-2xl font-black text-olivo-700">${stats.ingresosHoy.toFixed(2)}</p>
                     </div>
                 </div>
 
                 {/* Ventas Hoy */}
-                <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                <div className="bg-olivo-50 rounded-2xl p-6 border border-olivo-100 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-olivo-100 text-olivo-600 rounded-full flex items-center justify-center shrink-0">
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-blue-800 mb-1">Tickets Hoy</p>
-                        <p className="text-2xl font-black text-blue-700">{stats.ventasHoy}</p>
+                        <p className="text-sm font-bold text-olivo-800 mb-1">Tickets Hoy</p>
+                        <p className="text-2xl font-black text-olivo-700">{stats.ventasHoy}</p>
                     </div>
                 </div>
 
@@ -156,7 +156,7 @@ export const EstadisticasViewer = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-black text-emerald-600">${prod.total.toFixed(2)}</p>
+                                        <p className="font-black text-olivo-600">${prod.total.toFixed(2)}</p>
                                     </div>
                                 </div>
                             ))}
@@ -164,7 +164,7 @@ export const EstadisticasViewer = () => {
                     )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col items-center justify-center text-center">
+                <div className="bg-olivo-50 rounded-2xl border border-olivo-200 p-6 shadow-sm flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4">
                         <Calendar className="w-8 h-8" />
                     </div>

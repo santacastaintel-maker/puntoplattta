@@ -16,10 +16,10 @@ const getSemaforoColor = (c: Cliente) => {
 
 const semaforoStyles = {
     green: {
-        dot: 'bg-emerald-400',
-        ring: 'ring-emerald-200',
-        bg: 'bg-emerald-50',
-        text: 'text-emerald-700',
+        dot: 'bg-olivo-400',
+        ring: 'ring-olivo-200',
+        bg: 'bg-olivo-50',
+        text: 'text-olivo-700',
         label: '✓ Al día'
     },
     orange: {
@@ -162,10 +162,10 @@ export const ClientesPage = () => {
                                 <div className="pt-4 space-y-2">
                                     <div className="flex justify-between text-xs">
                                         <span className="text-slate-400">Total Compras</span>
-                                        <span className="font-bold text-emerald-600">${(selectedCliente.total_compras || 0).toFixed(2)}</span>
+                                        <span className="font-bold text-olivo-600">${(selectedCliente.total_compras || 0).toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-400">Ventas Realizadas</span>
+                                        <span className="text-white font-semibold italic">Andrés Montero Joyería</span>
                                         <span className="font-bold text-slate-700">{selectedCliente.numero_compras || 0}</span>
                                     </div>
                                     <div className="flex justify-between text-xs">
@@ -240,7 +240,7 @@ export const ClientesPage = () => {
                     onClick={() => setShowNewForm(!showNewForm)}
                     className={`px-6 py-3 font-bold rounded-2xl shadow-lg transition-all flex items-center gap-2 whitespace-nowrap ${showNewForm
                         ? 'bg-slate-200 text-slate-600 shadow-none hover:bg-slate-300'
-                        : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20'
+                        : 'bg-olivo-500 hover:bg-olivo-600 text-white shadow-olivo-500/20'
                         }`}
                 >
                     {showNewForm ? <X className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
@@ -253,20 +253,20 @@ export const ClientesPage = () => {
 
                     {/* ── Inline New Client Form ── */}
                     {showNewForm && (
-                        <form onSubmit={handleCrear} className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col sm:flex-row gap-3 animate-in slide-in-from-top-2 duration-200">
+                        <form onSubmit={handleCrear} className="bg-white p-5 rounded-2xl border border-olivo-200 shadow-sm flex flex-col sm:flex-row gap-3 animate-in slide-in-from-top-2 duration-200">
                             <input
                                 type="text" required autoFocus
                                 placeholder="Nombre del cliente..."
                                 value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })}
-                                className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+                                className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none text-sm"
                             />
                             <input
                                 type="tel"
                                 placeholder="WhatsApp (opcional)"
                                 value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })}
-                                className="w-full sm:w-48 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+                                className="w-full sm:w-48 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none text-sm"
                             />
-                            <button type="submit" className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 whitespace-nowrap">
+                            <button type="submit" className="px-6 py-3 bg-olivo-500 text-white font-bold rounded-xl hover:bg-olivo-600 transition-all shadow-lg shadow-olivo-500/20 whitespace-nowrap">
                                 + Registrar
                             </button>
                         </form>
@@ -288,13 +288,13 @@ export const ClientesPage = () => {
                                 placeholder="Buscar cliente por nombre o teléfono..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-olivo-500 transition-all"
                             />
                         </div>
                         <select
                             value={sortMode}
                             onChange={e => setSortMode(e.target.value as SortMode)}
-                            className="px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 outline-none focus:ring-2 focus:ring-olivo-500"
                         >
                             <option value="recientes">Más Recientes</option>
                             <option value="mas_gastado">💰 Más Dinero Gastado</option>
@@ -315,7 +315,7 @@ export const ClientesPage = () => {
                                 return (
                                     <div
                                         key={c.id}
-                                        className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 transition-all hover:shadow-md group relative"
+                                        className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-olivo-500 transition-all hover:shadow-md group relative"
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Avatar with semáforo dot */}
@@ -348,7 +348,7 @@ export const ClientesPage = () => {
                                                 <button onClick={() => handleSelectCliente(c)} className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors">
                                                     <History className="w-4 h-4 text-slate-400" /> Ver Historial
                                                 </button>
-                                                <button onClick={() => { setMenuOpenId(null); navigate('/venta'); }} className="w-full px-4 py-2.5 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-3 transition-colors">
+                                                <button onClick={() => { setMenuOpenId(null); navigate('/venta'); }} className="w-full px-4 py-2.5 text-left text-sm font-medium text-olivo-600 hover:bg-olivo-50 flex items-center gap-3 transition-colors">
                                                     <ShoppingBag className="w-4 h-4" /> Nueva Venta
                                                 </button>
                                                 <div className="border-t border-slate-100 my-1"></div>
@@ -366,7 +366,7 @@ export const ClientesPage = () => {
                                                     <Package className="w-3 h-3" /> {c.apartados_pendientes} Aparts.
                                                 </span>
                                             )}
-                                            <span className="text-emerald-500">${(c.total_compras || 0).toFixed(0)}</span>
+                                            <span className="text-olivo-500">${(c.total_compras || 0).toFixed(0)}</span>
                                         </div>
                                     </div>
                                 );
@@ -381,7 +381,7 @@ export const ClientesPage = () => {
                             <p className="text-slate-500 text-sm mt-1 mb-6">Agrega a tus clientes para premiar su fidelidad.</p>
                             <button
                                 onClick={() => setShowNewForm(true)}
-                                className="px-6 py-2.5 border-2 border-emerald-500 text-emerald-600 font-bold rounded-xl hover:bg-emerald-50 transition-colors"
+                                className="px-6 py-2.5 border-2 border-olivo-500 text-olivo-600 font-bold rounded-xl hover:bg-olivo-50 transition-colors"
                             >
                                 Crear mi primer cliente
                             </button>

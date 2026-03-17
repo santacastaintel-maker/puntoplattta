@@ -133,7 +133,7 @@ export const AdminPage = () => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `PUNTOPLATA_Backup_${new Date().toISOString().split('T')[0]}.ppdata`;
+            a.download = `AMJ_Backup_${new Date().toISOString().split('T')[0]}.ppdata`;
             a.click();
             URL.revokeObjectURL(url);
         } catch (err) {
@@ -192,9 +192,9 @@ export const AdminPage = () => {
     return (
         <div className="flex flex-col h-full bg-slate-50">
             {/* Header del Admin */}
-            <div className="bg-white border-b border-slate-200 px-6 py-4">
+            <div className="bg-white border-b border-slate-200 px-6 py-4 laurel-bg">
                 <h1 className="text-2xl font-bold text-slate-800">Panel de Administración</h1>
-                <p className="text-slate-500 text-sm mt-1">Gestión central de PUNTOPLATA</p>
+                <p className="text-slate-500 text-sm mt-1">Andrés Montero Joyería - Gestión Central</p>
 
                 {/* Tabs */}
                 <div className="flex gap-6 mt-6 border-b border-slate-100 overflow-x-auto hide-scrollbar pb-1">
@@ -202,24 +202,24 @@ export const AdminPage = () => {
                         onClick={() => setActiveTab('inventario')}
                         className={cn(
                             "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative whitespace-nowrap",
-                            activeTab === 'inventario' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                            activeTab === 'inventario' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
                         <PackageSearch className="w-4 h-4" />
                         Inventario
-                        {activeTab === 'inventario' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                        {activeTab === 'inventario' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                     </button>
                     {isAdmin && (
                         <button
                             onClick={() => setActiveTab('personal')}
                             className={cn(
                                 "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative whitespace-nowrap",
-                                activeTab === 'personal' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                                activeTab === 'personal' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                             )}
                         >
                             <Users className="w-4 h-4" />
                             Personal
-                            {activeTab === 'personal' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                            {activeTab === 'personal' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                         </button>
                     )}
                     {isAdmin && (
@@ -227,12 +227,12 @@ export const AdminPage = () => {
                             onClick={() => setActiveTab('licencias')}
                             className={cn(
                                 "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative",
-                                activeTab === 'licencias' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                                activeTab === 'licencias' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                             )}
                         >
                             <KeyRound className="w-4 h-4" />
                             Licencias
-                            {activeTab === 'licencias' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                            {activeTab === 'licencias' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                         </button>
                     )}
                     {isAdmin && (
@@ -240,36 +240,36 @@ export const AdminPage = () => {
                             onClick={() => setActiveTab('estadisticas')}
                             className={cn(
                                 "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative",
-                                activeTab === 'estadisticas' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                                activeTab === 'estadisticas' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                             )}
                         >
                             <BarChart3 className="w-4 h-4" />
                             Estadísticas
-                            {activeTab === 'estadisticas' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                            {activeTab === 'estadisticas' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                         </button>
                     )}
                     <button
                         onClick={() => setActiveTab('seguridad')}
                         className={cn(
                             "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative whitespace-nowrap",
-                            activeTab === 'seguridad' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                            activeTab === 'seguridad' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
                         <ShieldCheck className="w-4 h-4" />
                         Seguridad y Cobro
-                        {activeTab === 'seguridad' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                        {activeTab === 'seguridad' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                     </button>
                     {isAdmin && (
                         <button
                             onClick={() => setActiveTab('herramientas')}
                             className={cn(
                                 "pb-3 text-sm font-semibold transition-colors flex items-center gap-2 relative whitespace-nowrap",
-                                activeTab === 'herramientas' ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
+                                activeTab === 'herramientas' ? "text-[#80854b]" : "text-slate-500 hover:text-slate-700"
                             )}
                         >
                             <Wrench className="w-4 h-4" />
                             Herramientas (Élite)
-                            {activeTab === 'herramientas' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-t-full"></div>}
+                            {activeTab === 'herramientas' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#80854b] rounded-t-full"></div>}
                         </button>
                     )}
                 </div>
@@ -312,7 +312,7 @@ export const AdminPage = () => {
                                         value={businessName}
                                         onChange={(e) => setBusinessName(e.target.value)}
                                         placeholder="Ej: Joyería Doña Paty"
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none"
                                         autoComplete="off"
                                         required
                                     />
@@ -323,7 +323,7 @@ export const AdminPage = () => {
                                     <select
                                         value={licenseType}
                                         onChange={(e) => setLicenseType(e.target.value as LicenseType)}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none"
                                     >
                                         <option value="mensual">Mensual (30 días)</option>
                                         <option value="vitalicia">Vitalicia (Pago único)</option>
@@ -341,30 +341,30 @@ export const AdminPage = () => {
 
                         {/* Resultado */}
                         {generatedKey && (
-                            <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-6 animate-in slide-in-from-bottom-2 fade-in">
-                                <h3 className="text-emerald-800 font-bold mb-4">¡Llave Lista para Entrega!</h3>
+                            <div className="bg-olivo-50 rounded-2xl border border-olivo-200 p-6 animate-in slide-in-from-bottom-2 fade-in">
+                                <h3 className="text-olivo-800 font-bold mb-4">¡Llave Lista para Entrega!</h3>
 
-                                <div className="bg-white rounded-xl p-4 border border-emerald-100 shadow-sm relative group">
-                                    <p className="font-mono text-lg font-bold text-emerald-900 break-all pr-12">
+                                <div className="bg-white rounded-xl p-4 border border-olivo-100 shadow-sm relative group">
+                                    <p className="font-mono text-lg font-bold text-olivo-900 break-all pr-12">
                                         {generatedKey}
                                     </p>
 
                                     <button
                                         onClick={handleCopy}
-                                        className="absolute right-3 top-3 p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                                        className="absolute right-3 top-3 p-2 bg-olivo-50 text-olivo-600 rounded-lg hover:bg-olivo-100 transition-colors"
                                         title="Copiar llave"
                                     >
-                                        {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Copy className="w-5 h-5" />}
+                                        {copied ? <CheckCircle2 className="w-5 h-5 text-olivo-600" /> : <Copy className="w-5 h-5" />}
                                     </button>
                                 </div>
-                                <p className="text-sm font-medium text-emerald-700 mt-3 pl-1">
+                                <p className="text-sm font-medium text-olivo-700 mt-3 pl-1">
                                     {keyDetails}
                                 </p>
 
-                                <div className="mt-6 pt-6 border-t border-emerald-200/50">
-                                    <p className="text-sm text-emerald-800">
+                                <div className="mt-6 pt-6 border-t border-olivo-200/50">
+                                    <p className="text-sm text-olivo-800">
                                         📲 <strong>Instrucción para el cliente:</strong><br />
-                                        "Abre la aplicación PUNTOPLATA en tu dispositivo, ingresa exactamente como nombre del negocio <span className="font-bold underline">{businessName.trim().toUpperCase()}</span> y pega esta llave de activación."
+                                        "Abre la aplicación Andrés Montero Joyería en tu dispositivo, ingresa exactamente como nombre del negocio <span className="font-bold underline">{businessName.trim().toUpperCase()}</span> y pega esta llave de activación."
                                     </p>
                                 </div>
                             </div>
@@ -376,7 +376,7 @@ export const AdminPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-4xl mx-auto">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-olivo-100 text-olivo-600 rounded-xl flex items-center justify-center">
                                     <Lock className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -420,7 +420,7 @@ export const AdminPage = () => {
                                         maxLength={4}
                                         value={pinActual}
                                         onChange={(e) => setPinActual(e.target.value.replace(/\D/g, ''))}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-center text-xl tracking-[0.5em]"
+                                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-center text-xl tracking-[0.5em]"
                                         placeholder="****"
                                         required
                                     />
@@ -433,7 +433,7 @@ export const AdminPage = () => {
                                         maxLength={4}
                                         value={pinNuevo}
                                         onChange={(e) => setPinNuevo(e.target.value.replace(/\D/g, ''))}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-center text-xl tracking-[0.5em]"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-olivo-500 outline-none text-center text-xl tracking-[0.5em]"
                                         placeholder="****"
                                         required
                                     />
@@ -460,7 +460,7 @@ export const AdminPage = () => {
                                 )}
 
                                 {changeSuccess && (
-                                    <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-600 rounded-xl text-sm font-medium">
+                                    <div className="flex items-center gap-2 p-3 bg-olivo-50 text-olivo-600 rounded-xl text-sm font-medium">
                                         <CheckCircle2 className="w-4 h-4" />
                                         {changeSuccess}
                                     </div>
@@ -503,7 +503,7 @@ export const AdminPage = () => {
                                         max="100"
                                         value={maxDescuento}
                                         onChange={(e) => setMaxDescuento(parseInt(e.target.value) || 0)}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-700"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none font-bold text-[#80854b]"
                                         required
                                     />
                                 </div>
@@ -561,7 +561,7 @@ export const AdminPage = () => {
                         {/* Multiplicador de Precio */}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-olivo-100 text-olivo-600 rounded-xl flex items-center justify-center">
                                     <Wrench className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -578,7 +578,7 @@ export const AdminPage = () => {
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                                     />
                                 </div>
-                                <button type="submit" disabled={isProcessing} className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-xl transition-colors">
+                                <button type="submit" disabled={isProcessing} className="w-full py-3 bg-olivo-600 hover:bg-olivo-700 disabled:bg-olivo-400 text-white font-bold rounded-xl transition-colors">
                                     {isProcessing ? 'Procesando...' : 'Aplicar Multiplicador Masivo'}
                                 </button>
                             </form>
@@ -613,7 +613,7 @@ export const AdminPage = () => {
                                     </div>
                                 </div>
 
-                                <label className="w-full py-3 bg-white border-2 border-dashed border-emerald-500 hover:bg-emerald-50 text-emerald-700 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <label className="w-full py-3 bg-white border-2 border-dashed border-olivo-500 hover:bg-olivo-50 text-olivo-700 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                     <Upload className="w-5 h-5" />
                                     {isProcessing ? 'Procesando...' : 'Restaurar desde archivo'}
                                     <input type="file" className="hidden" accept=".ppdata,.json" onChange={handleRestore} disabled={isProcessing} />

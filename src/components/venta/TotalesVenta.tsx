@@ -23,8 +23,8 @@ export const TotalesVenta = ({ subtotal, descuento, total }: TotalesVentaProps) 
             )}
 
             <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
-                <span className="text-base font-bold text-slate-900 tracking-tight">TOTAL</span>
-                <span className="text-2xl font-black text-emerald-600 tracking-tighter">
+                <div className="text-olivo-600 font-bold text-sm tracking-tight">TOTAL</div>
+                <span className="text-2xl font-black text-olivo-600 tracking-tighter">
                     {formatPrecio(total)}
                 </span>
             </div>

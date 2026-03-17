@@ -26,7 +26,7 @@ export const colorToClass = (colorCode: string): string => {
     const map: Record<string, string> = {
         '#EF4444': 'bg-red-500',
         '#3B82F6': 'bg-blue-500',
-        '#10B981': 'bg-emerald-500',
+        '#80854b': 'bg-olivo-500',
         '#F59E0B': 'bg-amber-500',
         '#8B5CF6': 'bg-purple-500',
     };

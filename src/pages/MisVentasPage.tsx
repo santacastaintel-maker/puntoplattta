@@ -69,13 +69,13 @@ export const MisVentasPage = () => {
                     <div className="flex bg-slate-100 p-1 rounded-xl">
                         <button
                             onClick={() => setFiltroMio(true)}
-                            className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${filtroMio ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${filtroMio ? 'bg-white shadow-sm text-olivo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             Mis Ventas
                         </button>
                         <button
                             onClick={() => setFiltroMio(false)}
-                            className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${!filtroMio ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${!filtroMio ? 'bg-white shadow-sm text-olivo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             Todas las Ventas
                         </button>
@@ -94,13 +94,13 @@ export const MisVentasPage = () => {
                                 placeholder="Buscar por folio o cliente..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-mono text-sm"
+                                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-olivo-500 transition-all font-mono text-sm"
                             />
                         </div>
                         <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Mostrado</p>
-                                <p className="text-2xl font-black text-emerald-600">${totalVendido.toFixed(2)}</p>
+                                <p className="text-2xl font-black text-olivo-600">${totalVendido.toFixed(2)}</p>
                             </div>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ export const MisVentasPage = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     {venta.estado === 'completada' ? (
-                                                        <span className="inline-flex flex-col items-center justify-center p-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                                                        <span className="inline-flex flex-col items-center justify-center p-1.5 bg-olivo-50 text-olivo-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                                                             <CheckCircle2 className="w-4 h-4 mb-0.5" />
                                                             Completada
                                                         </span>

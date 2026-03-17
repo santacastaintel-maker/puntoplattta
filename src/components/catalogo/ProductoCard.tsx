@@ -49,7 +49,7 @@ export const ProductoCard = ({ producto, onAdd, onClick }: ProductoCardProps) =>
                 </h3>
 
                 <div className="flex items-center justify-between mt-auto pt-2">
-                    <span className="text-base font-bold text-emerald-600">
+                    <span className="text-base font-bold text-olivo-600">
                         {formatPrecio(producto.precio)}
                     </span>
                     <button
@@ -58,7 +58,7 @@ export const ProductoCard = ({ producto, onAdd, onClick }: ProductoCardProps) =>
                             if (!isOutOfStock) onAdd(producto);
                         }}
                         disabled={isOutOfStock}
-                        className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-emerald-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-olivo-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Agregar al carrito"
                     >
                         <Plus className="w-5 h-5" />

@@ -36,7 +36,7 @@ export const Layout = () => {
             {/* Sidebar Desktop */}
             <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200">
                 <div className="p-6">
-                    <h1 className="text-xl font-bold tracking-tight text-emerald-600">POS<span className="text-slate-900">Joyería</span></h1>
+                    <h1 className="text-xl font-bold tracking-tight text-[#80854b]">Andrés Montero <span className="text-slate-900">Joyería</span></h1>
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2 mt-4">
@@ -46,7 +46,7 @@ export const Layout = () => {
                             to={item.to}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive
-                                    ? 'bg-emerald-50 text-emerald-700'
+                                    ? 'bg-[#80854b]/10 text-[#80854b]'
                                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                 }`
                             }
@@ -68,7 +68,7 @@ export const Layout = () => {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-slate-900 leading-tight">{vendedorActual?.nombre}</span>
-                                <span className="text-xs text-emerald-600 capitalize font-medium">{vendedorActual?.rol}</span>
+                                <span className="text-[#80854b] capitalize font-medium text-[10px] tracking-wider uppercase">{vendedorActual?.rol}</span>
                             </div>
                         </div>
                         {isAdmin ? (
@@ -76,7 +76,7 @@ export const Layout = () => {
                                 <LogOut className="w-5 h-5" />
                             </button>
                         ) : (
-                            <button onClick={() => navigate('/login')} className="p-2 text-emerald-500 hover:text-emerald-600 transition-colors" title="Acceso Administrativo">
+                            <button onClick={() => navigate('/login')} className="p-2 text-[#80854b] hover:text-[#64683a] transition-colors" title="Acceso Administrativo">
                                 <Settings className="w-5 h-5" />
                             </button>
                         )}
@@ -89,7 +89,7 @@ export const Layout = () => {
                 <div className="flex-1 overflow-y-auto w-full mx-auto">
                     {/* Header Mobile Opcional */}
                     <div className="md:hidden sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-10 px-4 py-3 flex justify-between items-center pt-safe">
-                        <h1 className="text-lg font-bold text-slate-900 tracking-tight">POS Joyería</h1>
+                        <h1 className="text-lg font-bold text-slate-900 tracking-tight">Andrés Montero Joyería</h1>
                         <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm cursor-pointer"
                             style={{ backgroundColor: vendedorActual?.color_identificador || '#64748B' }}
@@ -114,7 +114,7 @@ export const Layout = () => {
                             key={item.label}
                             to={item.to}
                             className={({ isActive }) =>
-                                `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'
+                                `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? 'text-[#80854b]' : 'text-slate-400 hover:text-slate-600'
                                 }`
                             }
                         >

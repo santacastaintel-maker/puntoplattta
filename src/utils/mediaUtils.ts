@@ -89,7 +89,7 @@ export const resizeImage = (
  * @param productos Array de productos a incluir en el PDF
  * @param businessName Nombre del negocio para el encabezado
  */
-export const generateCatalogPDF = (productos: Producto[], businessName: string = 'PUNTOPLATA') => {
+export const generateCatalogPDF = (productos: Producto[], businessName: string = 'Andrés Montero Joyería') => {
     // Configuración inicial del documento
     const doc = new jsPDF({
         orientation: 'portrait',
@@ -98,7 +98,7 @@ export const generateCatalogPDF = (productos: Producto[], businessName: string =
     });
 
     // Colores y estilos
-    const primaryColor = [16, 185, 129]; // Emerald 500
+    const primaryColor = [128, 133, 75]; // Olivo 500
     const textColor = [51, 65, 85];      // Slate 700
 
     // --- ENCABEZADO ---
@@ -139,7 +139,7 @@ export const generateCatalogPDF = (productos: Producto[], businessName: string =
         body: tableData,
         theme: 'grid', // Grid mode is better for catalogs
         headStyles: {
-            fillColor: [16, 185, 129], // Emerald 500
+            fillColor: [128, 133, 75], // Olivo 500
             textColor: 255,
             fontStyle: 'bold',
             halign: 'center'
@@ -192,7 +192,7 @@ export const generateCatalogPDF = (productos: Producto[], businessName: string =
         doc.setFontSize(8);
         (doc as any).setTextColor(148, 163, 184); // Slate 400
         doc.text(
-            `Página ${i} de ${pageCount} - PUNTOPLATA System`,
+            `Página ${i} de ${pageCount} - Andrés Montero Joyería System`,
             doc.internal.pageSize.width / 2,
             doc.internal.pageSize.height - 10,
             { align: 'center' }

@@ -227,14 +227,14 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                             {/* Individual Files */}
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="p-8 border-2 border-dashed border-emerald-300 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 transition-all flex flex-col items-center gap-3 group"
+                                className="p-8 border-2 border-dashed border-olivo-300 rounded-2xl bg-olivo-50/50 hover:bg-olivo-50 transition-all flex flex-col items-center gap-3 group"
                             >
-                                <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div className="w-16 h-16 rounded-2xl bg-olivo-100 text-olivo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <FileImage className="w-8 h-8" />
                                 </div>
                                 <div className="text-center">
-                                    <p className="font-bold text-emerald-700">Archivos Sueltos</p>
-                                    <p className="text-xs text-emerald-500 mt-1">Selecciona 1 a 50 fotos.<br />Ideal si son poquitas.</p>
+                                    <p className="font-bold text-olivo-700">Archivos Sueltos</p>
+                                    <p className="text-xs text-olivo-500 mt-1">Selecciona 1 a 50 fotos.<br />Ideal si son poquitas.</p>
                                 </div>
                             </button>
 
@@ -287,7 +287,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                                 </div>
                                 <button
                                     onClick={applyBulkSettings}
-                                    className="px-4 py-2 bg-emerald-500 text-white text-sm font-bold rounded-xl hover:bg-emerald-600 transition-colors"
+                                    className="px-4 py-2 bg-olivo-500 text-white text-sm font-bold rounded-xl hover:bg-olivo-600 transition-colors"
                                 >
                                     Aplicar a Todas
                                 </button>
@@ -329,7 +329,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                                                     onChange={e => updatePhoto(photo.id, { nombre: e.target.value })}
                                                     onBlur={() => setEditingId(null)}
                                                     onKeyDown={e => e.key === 'Enter' && setEditingId(null)}
-                                                    className="w-full px-2 py-1 text-xs bg-emerald-50 border border-emerald-300 rounded-lg outline-none focus:ring-1 focus:ring-emerald-500"
+                                                    className="w-full px-2 py-1 text-xs bg-olivo-50 border border-olivo-300 rounded-lg outline-none focus:ring-1 focus:ring-olivo-500"
                                                 />
                                             ) : (
                                                 <div
@@ -353,7 +353,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                 <div className="p-4 border-t border-slate-100 flex items-center justify-between shrink-0 bg-white">
                     <div className="text-sm text-slate-600">
                         {saving ? (
-                            <span className="flex items-center gap-2 text-emerald-600 font-bold">
+                            <span className="flex items-center gap-2 text-olivo-600 font-bold">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                                 Guardando... {savedCount} / {pendingPhotos.length}
                             </span>
@@ -378,7 +378,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                         <button
                             onClick={handleSaveAll}
                             disabled={pendingPhotos.length === 0 || saving}
-                            className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold rounded-xl transition-colors text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 disabled:shadow-none"
+                            className="px-6 py-2.5 bg-olivo-500 hover:bg-olivo-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold rounded-xl transition-colors text-sm flex items-center gap-2 shadow-lg shadow-olivo-500/20 disabled:shadow-none"
                         >
                             <Check className="w-4 h-4" />
                             Crear {pendingPhotos.length} Producto{pendingPhotos.length !== 1 ? 's' : ''}
