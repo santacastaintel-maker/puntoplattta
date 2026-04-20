@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
-import { CATEGORIAS_DEFAULT, CONFIG } from '../../constants';
+import { CONFIG } from '../../constants';
 import { cn } from '../ui/Button';
+import { Categoria } from '../../types';
 
 interface BuscadorProps {
     onSearch: (query: string, categoryId?: string) => void;
+    categorias: Categoria[];
     className?: string;
 }
 
-export const Buscador = ({ onSearch, className }: BuscadorProps) => {
+export const Buscador = ({ onSearch, categorias, className }: BuscadorProps) => {
     const [query, setQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string>('todas');
 
@@ -47,7 +49,18 @@ export const Buscador = ({ onSearch, className }: BuscadorProps) => {
 
             {/* Categories Chips */}
             <div className="flex gap-2 overflow-x-auto pb-2 w-full touch-pan-x snap-x snap-mandatory scroll-p-4">
-                {CATEGORIAS_DEFAULT.map((cat) => (
+                <button
+                    onClick={() => setActiveCategory('todas')}
+                    className={cn(
+                        "whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm ring-1 ring-inset",
+                        activeCategory === 'todas'
+                            ? "bg-slate-900 text-white ring-slate-900 shadow-md transform scale-105"
+                            : "bg-white text-slate-600 ring-slate-200 hover:bg-slate-50 hover:text-slate-900"
+                    )}
+                >
+                    Todas
+                </button>
+                {categorias.map((cat) => (
                     <button
                         key={cat.id}
                         onClick={() => setActiveCategory(cat.id)}
@@ -58,7 +71,7 @@ export const Buscador = ({ onSearch, className }: BuscadorProps) => {
                                 : "bg-white text-slate-600 ring-slate-200 hover:bg-slate-50 hover:text-slate-900"
                         )}
                     >
-                        {cat.label}
+                        {cat.nombre}
                     </button>
                 ))}
             </div>

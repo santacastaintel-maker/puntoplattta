@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Edit3, Trash2, Save, X, Image, Package, Tag, Upload, FileSpreadsheet, Printer, CheckSquare, Square } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import JsBarcode from 'jsbarcode';
+import { Plus, Search, Edit3, Trash2, Save, X, Image, Package, Tag, Upload, FileSpreadsheet, Printer, CheckSquare, Square, LayoutGrid, ScrollText } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { BarcodeLabel } from './BarcodeLabel';
 import { cn } from '../ui/Button';
@@ -17,6 +19,7 @@ interface ProductoForm {
     precio: number;
     stock: number;
     foto_url: string;
+    marca: string;
 }
 
 const EMPTY_FORM: ProductoForm = {
@@ -26,7 +29,8 @@ const EMPTY_FORM: ProductoForm = {
     categoria_id: '',
     precio: 0,
     stock: 0,
-    foto_url: ''
+    foto_url: '',
+    marca: ''
 };
 
 export const InventarioManager = () => {
@@ -34,6 +38,7 @@ export const InventarioManager = () => {
     const [productos, setProductos] = useState<Producto[]>([]);
     const [filtro, setFiltro] = useState('');
     const [filtroCat, setFiltroCat] = useState('');
+    const [filtroMarca, setFiltroMarca] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Modal/Form state
@@ -54,13 +59,16 @@ export const InventarioManager = () => {
 
     // Label printing state
     const [selectedForLabels, setSelectedForLabels] = useState<string[]>([]);
+    const [labelQuantities, setLabelQuantities] = useState<Record<string, number>>({});
+    const [bulkLabelCopies, setBulkLabelCopies] = useState<number>(1);
+    const [printMode, setPrintMode] = useState<'hoja' | 'rollo'>('hoja');
     const [showPrintModal, setShowPrintModal] = useState(false);
 
     const fetchProductos = async () => {
         setLoading(true);
         let data = await db.productos.toArray();
 
-        // One-time sync for missing default categories
+        // One-time sync for missing default categories (Silent)
         const catsExistentes = await db.categorias.toArray();
         if (catsExistentes.length <= 2) {
             const defaults = [
@@ -78,18 +86,22 @@ export const InventarioManager = () => {
                     await db.categorias.add({ ...d, descripcion: null });
                 }
             }
-            window.location.reload(); // Reload once to pick up new categories
-            return;
+            // No reload, just continue
         }
 
         if (filtroCat) {
             data = data.filter(p => p.categoria_id === filtroCat);
         }
+        if (filtroMarca) {
+            const mq = filtroMarca.toLowerCase();
+            data = data.filter(p => (p.marca || '').toLowerCase().includes(mq));
+        }
         if (filtro) {
             const q = filtro.toLowerCase();
             data = data.filter(p =>
                 p.nombre.toLowerCase().includes(q) ||
-                p.codigo.toLowerCase().includes(q)
+                p.codigo.toLowerCase().includes(q) ||
+                (p.marca || '').toLowerCase().includes(q)
             );
         }
 
@@ -100,7 +112,18 @@ export const InventarioManager = () => {
 
     useEffect(() => {
         fetchProductos();
-    }, [filtro, filtroCat]);
+    }, [filtro, filtroCat, filtroMarca]);
+
+    // Intervalo de refresco automático (3 minutos)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!showForm && !showCatModal && !showBulkUploader && !showPrintModal) {
+                fetchProductos();
+            }
+        }, 180000); // 180,000 ms = 3 minutos
+
+        return () => clearInterval(interval);
+    }, [showForm, showCatModal, showBulkUploader, showPrintModal]);
 
     const handleOpenNew = () => {
         setEditingId(null);
@@ -118,7 +141,8 @@ export const InventarioManager = () => {
             categoria_id: p.categoria_id || '',
             precio: p.precio,
             stock: p.stock,
-            foto_url: p.foto_url || ''
+            foto_url: p.foto_url || '',
+            marca: p.marca || ''
         });
         setFormError('');
         setShowForm(true);
@@ -172,6 +196,7 @@ export const InventarioManager = () => {
                     precio: form.precio,
                     stock: form.stock,
                     foto_url: form.foto_url || null,
+                    marca: form.marca || null,
                 });
             } else {
                 await db.productos.add({
@@ -185,6 +210,7 @@ export const InventarioManager = () => {
                     foto_url: form.foto_url || null,
                     palabras_clave: null,
                     activo: true,
+                    marca: form.marca || null,
                 });
             }
             setShowForm(false);
@@ -221,12 +247,24 @@ export const InventarioManager = () => {
                     let importCount = 0;
                     await db.transaction('rw', db.productos, async () => {
                         for (const row of data) {
-                            // Mapeo flexible de columnas comunes
-                            const codigo = (row.Codigo || row.codigo || row.SKU || row.sku || `PP-EX-${Date.now().toString(36)}-${importCount}`).toString();
-                            const nombre = (row.Nombre || row.nombre || row.Producto || row.producto || 'Producto sin nombre').toString();
-                            const precio = parseFloat(row.Precio || row.precio || row.Costo || row.costo || '0');
-                            const stock = parseInt(row.Stock || row.stock || row.Existencia || row.existencia || '0');
-                            const descripcion = (row.Descripcion || row.descripcion || row.Notas || row.notas || null);
+                            // Mapeo flexible de columnas comunes (Sabiduría para detectar sinónimos)
+                            const findVal = (keys: string[]) => {
+                                for (const k of keys) {
+                                    if (row[k] !== undefined && row[k] !== null) return row[k];
+                                }
+                                return null;
+                            };
+
+                            const codigo = (findVal(['Codigo', 'codigo', 'SKU', 'sku', 'ID', 'id', 'Ref', 'ref']) || `PP-EX-${Date.now().toString(36)}-${importCount}`).toString();
+                            const nombre = (findVal(['Nombre', 'nombre', 'Producto', 'producto', 'Articulo', 'articulo']) || 'Producto sin nombre').toString();
+                            const precioVal = findVal(['Precio', 'precio', 'Costo', 'costo', 'Valor', 'valor', 'Importe', 'importe']);
+                            const stockVal = findVal(['Stock', 'stock', 'Existencia', 'existencia', 'Cantidad', 'cantidad', 'Cant', 'cant', 'Piezas', 'piezas', 'Pzas', 'pzas', 'Qty', 'qty']);
+                            const marcaVal = findVal(['Marca', 'marca', 'Brand', 'brand']);
+                            
+                            const precio = parseFloat(precioVal?.toString() || '0');
+                            const stock = parseInt(stockVal?.toString() || '0');
+                            const descripcion = findVal(['Descripcion', 'descripcion', 'Notas', 'notas', 'Comentarios', 'comentarios'])?.toString() || null;
+                            const marca = marcaVal?.toString() || null;
 
                             await db.productos.add({
                                 id: crypto.randomUUID(),
@@ -239,7 +277,8 @@ export const InventarioManager = () => {
                                 foto_url: null,
                                 palabras_clave: null,
                                 activo: true,
-                                origen: 'excel'
+                                origen: 'excel',
+                                marca: marca
                             });
                             importCount++;
                         }
@@ -274,6 +313,56 @@ export const InventarioManager = () => {
         return categorias.find(c => c.id === catId)?.nombre || 'Sin categoría';
     };
 
+    const handleDownloadRolloPDF = async () => {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: [60, 11]
+        });
+
+        const selectedProducts = productos.filter(p => selectedForLabels.includes(p.id));
+        let isFirstPage = true;
+        const canvas = document.createElement('canvas');
+
+        selectedProducts.forEach(p => {
+            const copies = labelQuantities[p.id] || 1;
+            for (let i = 0; i < copies; i++) {
+                if (!isFirstPage) {
+                    doc.addPage([60, 11], 'landscape');
+                }
+                isFirstPage = false;
+
+                // 1. Nombre (Arriba centrado en los 15mm)
+                doc.setFontSize(5);
+                doc.setTextColor(51, 65, 85);
+                const shortName = p.nombre.length > 20 ? p.nombre.substring(0, 18) + '..' : p.nombre;
+                doc.text(shortName.toUpperCase(), 7.5, 2.2, { align: 'center' });
+
+                // 2. Código de Barras (Centro de los 15mm)
+                JsBarcode(canvas, p.codigo.toUpperCase(), {
+                    format: "CODE128",
+                    width: 2,
+                    height: 40,
+                    displayValue: true,
+                    fontSize: 16,
+                    margin: 0
+                });
+                const barcodeImg = canvas.toDataURL("image/png");
+                doc.addImage(barcodeImg, 'PNG', 1, 3, 13, 5);
+
+                // 3. Precio (Abajo centrado en los 15mm)
+                doc.setFontSize(7);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(128, 133, 75);
+                doc.text(`$${p.precio.toFixed(2)}`, 7.5, 10, { align: 'center' });
+
+                // El resto (15mm a 60mm) queda blanco
+            }
+        });
+
+        doc.save(`Etiquetas_Joyeria_${Date.now()}.pdf`);
+    };
+
     return (
         <div className="space-y-6">
             {/* Toolbar */}
@@ -299,6 +388,13 @@ export const InventarioManager = () => {
                             <option key={c.id} value={c.id}>{c.nombre}</option>
                         ))}
                     </select>
+                    <input
+                        type="text"
+                        placeholder="Filtrar por marca..."
+                        value={filtroMarca}
+                        onChange={e => setFiltroMarca(e.target.value)}
+                        className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none w-36"
+                    />
                 </div>
                 <div className="flex gap-2 flex-wrap">
                     <button
@@ -406,9 +502,15 @@ export const InventarioManager = () => {
                                 {/* Selection checkbox */}
                                 <button 
                                     onClick={() => {
-                                        setSelectedForLabels(prev => 
-                                            prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
-                                        );
+                                        setSelectedForLabels(prev => {
+                                            const isSelected = prev.includes(p.id);
+                                            if (isSelected) {
+                                                return prev.filter(id => id !== p.id);
+                                            } else {
+                                                setLabelQuantities(q => ({ ...q, [p.id]: 1 }));
+                                                return [...prev, p.id];
+                                            }
+                                        });
                                     }}
                                     className={cn(
                                         "absolute top-2 left-2 p-1.5 rounded-lg shadow-md transition-colors",
@@ -422,7 +524,12 @@ export const InventarioManager = () => {
                             <div className="p-4">
                                 <p className="text-xs font-mono text-slate-400 mb-1">{p.codigo}</p>
                                 <h4 className="font-bold text-slate-800 truncate">{p.nombre}</h4>
-                                <p className="text-xs text-slate-500 mt-0.5">{getCategoryName(p.categoria_id)}</p>
+                                <div className="flex items-center justify-between mt-0.5 gap-1">
+                                    <p className="text-xs text-slate-500">{getCategoryName(p.categoria_id)}</p>
+                                    {p.marca && (
+                                        <span className="text-[10px] font-bold bg-olivo-50 text-olivo-700 px-1.5 py-0.5 rounded-full border border-olivo-200 truncate max-w-[70px]">{p.marca}</span>
+                                    )}
+                                </div>
                                 <p className="text-lg font-black text-[#80854b] mt-2">${p.precio.toFixed(2)}</p>
                             </div>
                         </div>
@@ -497,6 +604,18 @@ export const InventarioManager = () => {
                                     rows={2}
                                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm resize-none"
                                     placeholder="Descripción breve..."
+                                />
+                            </div>
+
+                            {/* Marca */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">Marca (opcional)</label>
+                                <input
+                                    type="text"
+                                    value={form.marca}
+                                    onChange={e => setForm({ ...form, marca: e.target.value })}
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#80854b] outline-none text-sm"
+                                    placeholder="Ej: Swarovski, Pandora, Propia..."
                                 />
                             </div>
 
@@ -586,7 +705,6 @@ export const InventarioManager = () => {
                                         <button onClick={async () => {
                                             if (confirm(`¿Eliminar la categoría "${c.nombre}"?`)) {
                                                 await db.categorias.delete(c.id);
-                                                window.location.reload();
                                             }
                                         }} className="text-rose-400 hover:text-rose-600 transition-colors">
                                             <Trash2 className="w-4 h-4" />
@@ -625,40 +743,150 @@ export const InventarioManager = () => {
             {showPrintModal && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                             <div>
                                 <h2 className="text-xl font-bold text-slate-800">Generador de Etiquetas</h2>
-                                <p className="text-sm text-slate-500">Vista previa de impresión para {selectedForLabels.length} productos.</p>
+                                <p className="text-sm text-slate-500">
+                                    {printMode === 'hoja' ? 'Mosaico para hojas' : 'Modo Rollo (Ribetec)'} - {selectedForLabels.length} productos.
+                                </p>
                             </div>
-                            <button onClick={() => setShowPrintModal(false)} className="p-1 hover:bg-slate-100 rounded-full transition-colors">
+                            <div className="flex flex-col gap-2 bg-slate-100/50 p-2 rounded-2xl border border-slate-200">
+                                <span className="text-[10px] font-black text-slate-400 uppercase px-2 tracking-wider">Modo de Impresión</span>
+                                <div className="flex bg-slate-200/50 p-1 rounded-xl">
+                                    <button 
+                                        onClick={() => setPrintMode('hoja')}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200", 
+                                            printMode === 'hoja' ? "bg-white text-olivo-600 shadow-md scale-105" : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                                        )}
+                                    >
+                                        <LayoutGrid className="w-3.5 h-3.5" />
+                                        Hoja (Mosaico)
+                                    </button>
+                                    <button 
+                                        onClick={() => setPrintMode('rollo')}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200", 
+                                            printMode === 'rollo' ? "bg-white text-olivo-600 shadow-md scale-105" : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                                        )}
+                                    >
+                                        <ScrollText className="w-3.5 h-3.5" />
+                                        Rollo (Ribetec)
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                                <span className="text-xs font-bold text-slate-500 uppercase px-2">Copias rápidas:</span>
+                                <input 
+                                    type="number" min="1" max="100"
+                                    value={bulkLabelCopies}
+                                    onChange={e => {
+                                        const val = parseInt(e.target.value) || 1;
+                                        setBulkLabelCopies(val);
+                                        const next: Record<string, number> = {};
+                                        selectedForLabels.forEach(id => next[id] = val);
+                                        setLabelQuantities(next);
+                                    }}
+                                    className="w-16 px-2 py-1 bg-white border border-slate-200 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-olivo-500"
+                                />
+                                <button 
+                                    onClick={() => {
+                                        const next: Record<string, number> = {};
+                                        selectedForLabels.forEach(id => next[id] = bulkLabelCopies);
+                                        setLabelQuantities(next);
+                                    }}
+                                    className="px-3 py-1 bg-olivo-500 text-white text-xs font-bold rounded-lg hover:bg-olivo-600 transition-colors"
+                                >
+                                    Aplicar a todos
+                                </button>
+                            </div>
+                            <button onClick={() => setShowPrintModal(false)} className="p-1 hover:bg-slate-100 rounded-full transition-colors self-end sm:self-center">
                                 <X className="w-5 h-5 text-slate-500" />
                             </button>
                         </div>
                         
-                        <div className="flex-1 overflow-y-auto p-8 bg-slate-100 print:bg-white print:p-0">
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 print:block print:w-full" id="labels-to-print">
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 print:bg-white print:p-0">
+                            {/* Editor de cantidades (Solo pantalla) */}
+                            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 print:hidden">
                                 {productos.filter(p => selectedForLabels.includes(p.id)).map(p => (
-                                    <div key={p.id} className="print:inline-block print:m-1">
-                                        <BarcodeLabel codigo={p.codigo} nombre={p.nombre} precio={p.precio} />
+                                    <div key={`qty-${p.id}`} className="bg-white p-3 rounded-2xl border border-slate-200 flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-10 h-10 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-slate-100 overflow-hidden">
+                                                {p.foto_url ? <img src={p.foto_url} className="w-full h-full object-cover" /> : <Tag className="w-5 h-5 text-slate-300" />}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-bold text-slate-800 truncate">{p.nombre}</p>
+                                                <p className="text-[10px] text-slate-400 font-mono">{p.codigo}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <button 
+                                                onClick={() => setLabelQuantities(prev => ({ ...prev, [p.id]: Math.max(1, (prev[p.id] || 1) - 1) }))}
+                                                className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors"
+                                            >-</button>
+                                            <input 
+                                                type="number" min="1"
+                                                value={labelQuantities[p.id] || 1}
+                                                onChange={e => setLabelQuantities(prev => ({ ...prev, [p.id]: parseInt(e.target.value) || 1 }))}
+                                                className="w-10 text-center text-sm font-bold bg-transparent outline-none"
+                                            />
+                                            <button 
+                                                onClick={() => setLabelQuantities(prev => ({ ...prev, [p.id]: (prev[p.id] || 1) + 1 }))}
+                                                className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors"
+                                            >+</button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* El Mosaico o Rollo Real */}
+                            <div 
+                                className={cn(
+                                    "bg-white p-4 sm:p-8 rounded-3xl shadow-inner min-h-[100px] mx-auto print:shadow-none print:p-0 print:m-0",
+                                    printMode === 'hoja' ? "flex flex-wrap gap-[1mm] print:gap-[0.5mm] justify-center sm:justify-start w-full max-w-[210mm]" : "flex flex-col items-center w-full max-w-[65mm]"
+                                )} 
+                                id="labels-to-print"
+                            >
+                                {productos.filter(p => selectedForLabels.includes(p.id)).flatMap(p => {
+                                    const copies = labelQuantities[p.id] || 1;
+                                    return Array.from({ length: copies }).map((_, i) => (
+                                        <div key={`${p.id}-${i}`} className={cn("print:m-0", printMode === 'rollo' && "print:break-after-page")}>
+                                            <BarcodeLabel 
+                                                codigo={p.codigo} 
+                                                nombre={p.nombre} 
+                                                precio={p.precio} 
+                                                ancho={printMode === 'rollo' ? '60mm' : '15mm'}
+                                            />
+                                        </div>
+                                    ));
+                                })}
+                            </div>
                         </div>
 
-                        <div className="p-6 border-t border-slate-100 flex gap-3 print:hidden">
+                        <div className="p-6 border-t border-slate-100 flex flex-col sm:flex-row gap-3 print:hidden">
                             <button
                                 onClick={() => setSelectedForLabels([])}
                                 className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-sm"
                             >
                                 Limpiar Selección
                             </button>
-                            <button
-                                onClick={() => window.print()}
-                                className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
-                            >
-                                <Printer className="w-5 h-5" />
-                                Imprimir Etiquetas Ahora
-                            </button>
+                            {printMode === 'rollo' ? (
+                                <button
+                                    onClick={handleDownloadRolloPDF}
+                                    className="flex-1 py-3 bg-olivo-600 hover:bg-olivo-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg"
+                                >
+                                    <FileSpreadsheet className="w-5 h-5" />
+                                    Descargar PDF para Rollo (60x11mm)
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => window.print()}
+                                    className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+                                >
+                                    <Printer className="w-5 h-5" />
+                                    Imprimir Etiquetas Ahora
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -670,12 +898,36 @@ export const InventarioManager = () => {
                             #labels-to-print, #labels-to-print * {
                                 visibility: visible;
                             }
-                            #labels-to-print {
+                             #labels-to-print {
                                 position: absolute;
                                 left: 0;
                                 top: 0;
                                 width: 100%;
+                                display: ${printMode === 'hoja' ? 'flex' : 'block'} !important;
+                                flex-wrap: wrap !important;
+                                gap: 0.5mm !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                background: white !important;
+                                justify-content: flex-start !important;
                             }
+                            ${printMode === 'rollo' ? `
+                            @page {
+                                size: 60mm 11mm;
+                                margin: 0;
+                            }
+                            #labels-to-print > div {
+                                width: 60mm !important;
+                                height: 11mm !important;
+                                break-after: page;
+                            }
+                            ` : `
+                            #labels-to-print > div {
+                                width: 15mm !important;
+                                height: 11mm !important;
+                                page-break-inside: avoid;
+                            }
+                            `}
                         }
                     `}</style>
                 </div>

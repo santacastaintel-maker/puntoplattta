@@ -1,24 +1,19 @@
-const CACHE_NAME = 'pos-joyeria-v1';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'am-joyeria-v2';
+const ASSETS_TO_PRECACHE = [
     '/',
     '/index.html',
-    '/manifest.json',
-    '/src/main.tsx',
-    '/src/index.css'
+    '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_PRECACHE))
     );
+    self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });

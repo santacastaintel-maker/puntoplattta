@@ -35,8 +35,15 @@ export const Layout = () => {
 
             {/* Sidebar Desktop */}
             <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200">
-                <div className="p-6">
-                    <h1 className="text-xl font-bold tracking-tight text-[#80854b]">Andrés Montero <span className="text-slate-900">Joyería</span></h1>
+                <div className="p-6 flex flex-col items-start gap-3">
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo_andres.jpg"
+                            alt="Logo Andrés Montero"
+                            className="w-9 h-9 rounded-lg object-cover opacity-80"
+                        />
+                        <h1 className="text-xl font-bold tracking-tight text-[#80854b]">Andrés Montero <span className="text-slate-900">Joyería</span></h1>
+                    </div>
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2 mt-4">

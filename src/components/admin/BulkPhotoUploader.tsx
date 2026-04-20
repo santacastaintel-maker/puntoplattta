@@ -7,12 +7,13 @@ interface PendingPhoto {
     id: string;
     file: File;
     previewUrl: string;
-    nombre: string;    // editable por el usuario
-    codigo: string;    // SKU auto-generado
+    nombre: string;
+    codigo: string;
     categoria_id: string;
+    marca: string;
     precio: number;
     stock: number;
-    base64?: string;   // resultado de resize
+    base64?: string;
 }
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
 export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, onComplete }) => {
     const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
     const [bulkCategoria, setBulkCategoria] = useState('');
+    const [bulkMarca, setBulkMarca] = useState('');
     const [bulkPrecio, setBulkPrecio] = useState(0);
     const [bulkStock, setBulkStock] = useState(1);
     const [saving, setSaving] = useState(false);
@@ -82,6 +84,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                 nombre: displayName,
                 codigo,
                 categoria_id: bulkCategoria,
+                marca: bulkMarca,
                 precio: bulkPrecio,
                 stock: bulkStock,
             });
@@ -130,6 +133,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
         setPendingPhotos(prev => prev.map(p => ({
             ...p,
             categoria_id: bulkCategoria || p.categoria_id,
+            marca: bulkMarca !== '' ? bulkMarca : p.marca,
             precio: bulkPrecio > 0 ? bulkPrecio : p.precio,
             stock: bulkStock > 0 ? bulkStock : p.stock,
         })));
@@ -175,6 +179,7 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                     foto_url: base64,
                     palabras_clave: null,
                     activo: true,
+                    marca: photo.marca || null,
                 });
 
                 setSavedCount(i + 1);
@@ -261,11 +266,21 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                                     <select
                                         value={bulkCategoria}
                                         onChange={e => setBulkCategoria(e.target.value)}
-                                        className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                        className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
                                     >
                                         <option value="">Seleccionar...</option>
                                         {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Marca (todas)</label>
+                                    <input
+                                        type="text"
+                                        value={bulkMarca}
+                                        onChange={e => setBulkMarca(e.target.value)}
+                                        placeholder="Ej: Swarovski..."
+                                        className="w-28 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#80854b] outline-none"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Precio todas ($)</label>

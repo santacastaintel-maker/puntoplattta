@@ -40,6 +40,18 @@ export class PuntoPlataDB extends Dexie {
             venta_detalles: 'id, venta_id, producto_id',
             config: 'key'
         });
+
+        // v4: Add marca field to productos
+        this.version(4).stores({
+            vendedores: 'id, rol, nombre',
+            categorias: 'id, nombre, orden_visual',
+            productos: 'id, codigo, nombre, categoria_id, activo, origen, marca',
+            clientes: 'id, nombre, telefono, apartados_pendientes',
+            sesiones_live: 'id, activa',
+            ventas: 'id, folio, fecha, estado, cliente_id, vendedor_id',
+            venta_detalles: 'id, venta_id, producto_id',
+            config: 'key'
+        });
     }
 }
 
@@ -51,11 +63,9 @@ db.on('populate', async () => {
         id: 'admin-id-123',
         nombre: 'Dueño',
         email: null,
-        color_identificador: '#10B981',
+        color_identificador: '#80854b',
         rol: 'admin',
         activo: true,
-        // En IndexedDB guardaremos el PIN directamente o un hash simple. 
-        // Para simplificar, añadimos un campo pin_auth aquí
         pin_auth: '9999' as any
     });
 

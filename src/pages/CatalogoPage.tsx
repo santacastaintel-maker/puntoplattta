@@ -8,10 +8,12 @@ import { ShoppingCart, FileDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { generateCatalogPDF } from '../utils/mediaUtils';
+import { useCategorias } from '../hooks/useCategorias';
 
 export const CatalogoPage = () => {
     const { vendedorActual } = useAuth();
     const { productos, loading, error, buscarProductos } = useProductos();
+    const { categorias } = useCategorias();
     const { totalItems, addToCart } = useCart();
     const navigate = useNavigate();
 
@@ -65,7 +67,7 @@ export const CatalogoPage = () => {
                     </div>
                 </div>
 
-                <Buscador onSearch={handleSearch} />
+                <Buscador onSearch={handleSearch} categorias={categorias} />
             </div>
 
             {/* Grid de Productos */}

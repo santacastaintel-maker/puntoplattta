@@ -27,8 +27,9 @@ export interface Producto {
     foto_url: string | null;
     palabras_clave: string[] | null;
     activo: boolean;
-    origen?: 'excel' | 'app'; // Para diferenciar inventarios
-    categorias?: Categoria; // Relacionado
+    origen?: 'excel' | 'app';
+    marca?: string | null;       // Campo Marca añadido
+    categorias?: Categoria;      // Relacionado
 }
 
 export type TipoCliente = 'premium' | 'normal' | 'conflictivo';
@@ -104,6 +105,7 @@ export interface AuthSession {
 export interface FiltrosProductos {
     categoria_id?: string;
     stock_minimo?: number;
+    marca?: string;
 }
 
 export interface FiltroVentas {

@@ -5,29 +5,38 @@ interface BarcodeLabelProps {
     codigo: string;
     nombre: string;
     precio: number;
+    ancho?: string; // e.g. "60mm"
 }
 
-export const BarcodeLabel = ({ codigo, nombre, precio }: BarcodeLabelProps) => {
+export const BarcodeLabel = ({ codigo, nombre, precio, ancho = '15mm' }: BarcodeLabelProps) => {
     const svgRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
         if (svgRef.current) {
-            JsBarcode(svgRef.current, codigo, {
+            JsBarcode(svgRef.current, codigo.toUpperCase(), {
                 format: "CODE128",
-                width: 1.2,
-                height: 30,
+                width: ancho === '15mm' ? 0.8 : 1.2, // Más ancho si hay espacio
+                height: 18,
                 displayValue: true,
-                fontSize: 10,
-                margin: 0
+                fontSize: 6,
+                margin: 0,
+                textMargin: 0
             });
         }
-    }, [codigo]);
+    }, [codigo, ancho]);
 
     return (
-        <div className="label-container p-2 border border-slate-200 rounded bg-white flex flex-col items-center justify-center w-[40mm] h-[25mm] overflow-hidden">
-            <p className="text-[8px] font-bold text-slate-800 truncate w-full text-center uppercase">{nombre}</p>
-            <svg ref={svgRef} className="max-w-full"></svg>
-            <p className="text-[10px] font-black text-olivo-700 mt-1">${precio.toFixed(2)}</p>
+        <div className="label-container border border-slate-300 bg-white flex flex-col items-center justify-center overflow-hidden"
+             style={{ width: ancho, height: '11mm', padding: '0.5mm' }}>
+            <p className="font-bold text-slate-800 uppercase leading-none text-center w-full truncate"
+               style={{ fontSize: ancho === '15mm' ? '4.5px' : '7.5px', marginBottom: '0.5mm' }}>
+                {nombre}
+            </p>
+            <svg ref={svgRef} style={{ width: '100%', maxHeight: '5.5mm' }}></svg>
+            <p className="font-black text-olivo-700 leading-none"
+               style={{ fontSize: ancho === '15mm' ? '5px' : '8px' }}>
+                ${precio.toFixed(2)}
+            </p>
         </div>
     );
 };
