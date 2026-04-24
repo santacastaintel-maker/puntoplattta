@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Vendedor } from '../types';
 import { db } from '../lib/db';
+import { api } from '../lib/apiClient';
 
 interface AuthResponse {
     success: boolean;
@@ -23,6 +24,22 @@ export const useAuth = () => {
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    // Sincronizar vendedores desde Turso al arrancar (si hay internet)
+    useEffect(() => {
+        const syncVendedores = async () => {
+            if (navigator.onLine) {
+                try {
+                    const fromCloud = await api.vendedores.list();
+                    // Guardar en Dexie para uso offline
+                    await db.vendedores.bulkPut(fromCloud.map((v: any) => ({ ...v, activo: v.activo })));
+                } catch {
+                    // Si falla la sync, no bloqueamos — usamos los datos locales
+                }
+            }
+        };
+        syncVendedores();
+    }, []);
+
     useEffect(() => {
         const checkSession = async () => {
             const savedSession = localStorage.getItem('pos_session');
@@ -30,7 +47,7 @@ export const useAuth = () => {
                 try {
                     const parsed = JSON.parse(savedSession);
                     if (parsed.vendedor) {
-                        // Verify if vendor still exists locally and is active
+                        // Verificar si el vendedor sigue activo (primero en Dexie local)
                         const dbVend = await db.vendedores.get(parsed.vendedor.id);
                         if (dbVend && dbVend.activo) {
                             setVendedorActual(dbVend);
@@ -42,7 +59,7 @@ export const useAuth = () => {
                     } else {
                         setVendedorActual(VENDEDOR_ESTANDAR);
                     }
-                } catch (e) {
+                } catch {
                     localStorage.removeItem('pos_session');
                     setVendedorActual(VENDEDOR_ESTANDAR);
                 }
@@ -57,13 +74,13 @@ export const useAuth = () => {
     const login = useCallback(async (vendedorId: string, pin: string): Promise<AuthResponse> => {
         try {
             setLoading(true);
+            // Buscar en Dexie local (siempre funciona, online u offline)
             const vend = await db.vendedores.get(vendedorId);
 
             if (!vend || !vend.activo) {
                 return { success: false, error: 'Usuario no encontrado o inactivo.' };
             }
 
-            // Todos requieren NIP localmente
             if (vend.pin_auth !== pin) {
                 return { success: false, error: 'NIP Incorrecto' };
             }
@@ -74,7 +91,7 @@ export const useAuth = () => {
             setToken(mockToken);
             return { success: true, vendedor: vend, token: mockToken };
         } catch (error: any) {
-            return { success: false, error: error.message || 'Error de lectura de credenciales.' };
+            return { success: false, error: error.message || 'Error de credenciales.' };
         } finally {
             setLoading(false);
         }
@@ -87,21 +104,19 @@ export const useAuth = () => {
     }, []);
 
     const changePin = useCallback(async (pinActual: string, pinNuevo: string) => {
-        if (!vendedorActual || vendedorActual.id === 'guest') {
-            return { success: false, error: 'Acceso no permitido' };
-        }
-
+        if (!vendedorActual) return { success: false, error: 'Sin sesión activa' };
         try {
             setLoading(true);
             const vend = await db.vendedores.get(vendedorActual.id);
             if (!vend) return { success: false, error: 'Usuario no existe' };
+            if (vend.pin_auth !== pinActual) return { success: false, error: 'El PIN actual es incorrecto' };
 
-            if (vend.pin_auth !== pinActual) {
-                return { success: false, error: 'El PIN actual es incorrecto' };
+            // Actualizar en Turso + Dexie
+            if (navigator.onLine) {
+                await api.vendedores.update(vendedorActual.id, { pin_auth: pinNuevo });
             }
-
-            await db.vendedores.update(vend.id, { pin_auth: pinNuevo });
-            return { success: true, message: 'PIN actualizado exitosamente' };
+            await db.vendedores.update(vendedorActual.id, { pin_auth: pinNuevo });
+            return { success: true, message: 'PIN actualizado correctamente' };
         } catch (error: any) {
             return { success: false, error: error.message || 'Error al cambiar PIN' };
         } finally {

@@ -13,11 +13,11 @@ export default defineConfig({
     server: {
         port: 5173,
         proxy: {
-            // Configuración de proxy para desarrollo local de Supabase Edge Functions
-            '/functions/v1': {
-                target: 'http://127.0.0.1:54321',
+            // En desarrollo: las llamadas /api se redirigen a `vercel dev` (puerto 3000)
+            '/api': {
+                target: 'http://localhost:3000',
                 changeOrigin: true,
-            }
-        }
-    }
+            },
+        },
+    },
 });

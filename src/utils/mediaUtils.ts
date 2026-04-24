@@ -89,7 +89,7 @@ export const resizeImage = (
  * @param productos Array de productos a incluir en el PDF
  * @param businessName Nombre del negocio para el encabezado
  */
-export const generateCatalogPDF = (productos: Producto[], businessName: string = 'Andrés Montero Joyería') => {
+export const generateCatalogPDF = (productos: Producto[], businessName: string = 'Miri Montero Joyería') => {
     // Configuración inicial del documento
     const doc = new jsPDF({
         orientation: 'portrait',
@@ -192,7 +192,7 @@ export const generateCatalogPDF = (productos: Producto[], businessName: string =
         doc.setFontSize(8);
         (doc as any).setTextColor(148, 163, 184); // Slate 400
         doc.text(
-            `Página ${i} de ${pageCount} - Andrés Montero Joyería System`,
+            `Página ${i} de ${pageCount} - Miri Montero Joyería System`,
             doc.internal.pageSize.width / 2,
             doc.internal.pageSize.height - 10,
             { align: 'center' }

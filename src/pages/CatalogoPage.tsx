@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useProductos } from '../hooks/useProductos';
 import { Buscador } from '../components/catalogo/Buscador';
@@ -22,18 +22,18 @@ export const CatalogoPage = () => {
         buscarProductos('');
     }, [buscarProductos]);
 
-    const handleSearch = (query: string, categoriaId?: string) => {
+    const handleSearch = useCallback((query: string, categoriaId?: string) => {
         buscarProductos(query, { categoria_id: categoriaId });
-    };
+    }, [buscarProductos]);
 
-    const handleAddToCart = (producto: Producto) => {
+    const handleAddToCart = useCallback((producto: Producto) => {
         addToCart(producto);
-    };
+    }, [addToCart]);
 
-    const handleProductClick = (producto: Producto) => {
+    const handleProductClick = useCallback((producto: Producto) => {
         // Podría abrir un modal con detalles del producto
         console.log('Detalle de:', producto.nombre);
-    };
+    }, []);
 
     return (
         <div className="flex flex-col h-full bg-slate-50">
@@ -46,7 +46,7 @@ export const CatalogoPage = () => {
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => generateCatalogPDF(productos, 'Andrés Montero Joyería')}
+                            onClick={() => generateCatalogPDF(productos, 'Miri Montero Joyería')}
                             className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors text-sm"
                             title="Descargar Catálogo PDF"
                         >

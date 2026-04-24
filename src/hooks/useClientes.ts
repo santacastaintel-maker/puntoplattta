@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { api } from '../lib/apiClient';
 import { db } from '../lib/db';
 import { Cliente } from '../types';
 
@@ -11,23 +12,23 @@ export const useClientes = () => {
         try {
             setLoading(true);
             setError(null);
-
-            let data = await db.clientes.toArray();
-
-            if (query) {
-                const lowerQuery = query.toLowerCase();
-                data = data.filter(c =>
-                    c.nombre.toLowerCase().includes(lowerQuery) ||
-                    (c.telefono && c.telefono.includes(query))
-                );
+            let data: Cliente[];
+            if (navigator.onLine) {
+                data = await api.clientes.list(query) as Cliente[];
+            } else {
+                data = await db.clientes.toArray();
+                if (query) {
+                    const lq = query.toLowerCase();
+                    data = data.filter(c =>
+                        c.nombre.toLowerCase().includes(lq) ||
+                        (c.telefono && c.telefono.includes(query))
+                    );
+                }
+                data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                data = data.slice(0, 20);
             }
-
-            data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-            // Limit to 20
-            const result = data.slice(0, 20);
-            setClientes(result);
-            return result;
+            setClientes(data);
+            return data;
         } catch (err: any) {
             setError(err.message || 'Error al buscar clientes');
             return [];
@@ -39,10 +40,12 @@ export const useClientes = () => {
     const getClienteById = useCallback(async (id: string) => {
         try {
             setLoading(true);
-            const cliente = await db.clientes.get(id);
-            return cliente || null;
+            if (navigator.onLine) {
+                return await api.clientes.get(id) as Cliente;
+            }
+            return await db.clientes.get(id) || null;
         } catch (err: any) {
-            setError(err.message || 'Cliente no encontrado');
+            setError(err.message);
             return null;
         } finally {
             setLoading(false);
@@ -53,37 +56,11 @@ export const useClientes = () => {
         try {
             setLoading(true);
             setError(null);
-
-            // Buscar si ya existe por nombre exacto o teléfono
-            const existentes = await db.clientes.toArray();
-            const clienteExistente = existentes.find(c =>
-                (c.telefono && payload.telefono && c.telefono === payload.telefono) ||
-                c.nombre.toLowerCase() === payload.nombre.toLowerCase()
-            );
-
-            if (clienteExistente) {
-                return clienteExistente;
-            }
-
-            const nuevoCliente: Cliente = {
-                id: crypto.randomUUID(),
-                nombre: payload.nombre,
-                telefono: payload.telefono || null,
-                email: payload.email || null,
-                tipo_cliente: 'normal',
-                notas: null,
-                total_compras: 0,
-                numero_compras: 0,
-                apartados_pendientes: 0,
-                cancelaciones: 0,
-                created_at: new Date().toISOString()
-            };
-
-            await db.clientes.add(nuevoCliente);
-            return nuevoCliente;
-
+            const cliente = await api.clientes.create(payload) as Cliente;
+            await db.clientes.put(cliente);
+            return cliente;
         } catch (err: any) {
-            setError(err.message || 'Error al crear cliente');
+            setError(err.message);
             throw err;
         } finally {
             setLoading(false);
@@ -93,27 +70,18 @@ export const useClientes = () => {
     const getHistorialCliente = useCallback(async (id: string) => {
         try {
             setLoading(true);
-
-            const ventasCliente = await db.ventas.where('cliente_id').equals(id).toArray();
-            ventasCliente.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-            return ventasCliente;
-
+            if (navigator.onLine) {
+                return await api.clientes.historial(id);
+            }
+            const ventas = await db.ventas.where('cliente_id').equals(id).toArray();
+            return ventas.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         } catch (err: any) {
-            setError(err.message || 'Error al obtener historial');
+            setError(err.message);
             return [];
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return {
-        clientes,
-        loading,
-        error,
-        buscarClientes,
-        getClienteById,
-        crearCliente,
-        getHistorialCliente
-    };
+    return { clientes, loading, error, buscarClientes, getClienteById, crearCliente, getHistorialCliente };
 };

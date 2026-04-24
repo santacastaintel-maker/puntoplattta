@@ -2,6 +2,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Home, ShoppingCart, ListOrdered, Users, Settings, LogOut, BookOpen, Sparkles } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { OnlineStatus } from '../ui/OnlineStatus';
 
 export const Layout = () => {
     const { vendedorActual, logout, isAdmin } = useAuth();
@@ -38,11 +39,11 @@ export const Layout = () => {
                 <div className="p-6 flex flex-col items-start gap-3">
                     <div className="flex items-center gap-3">
                         <img
-                            src="/logo_andres.jpg"
-                            alt="Logo Andrés Montero"
+                            src="/MIRIlogo.png"
+                            alt="Logo Miri Montero"
                             className="w-9 h-9 rounded-lg object-cover opacity-80"
                         />
-                        <h1 className="text-xl font-bold tracking-tight text-[#80854b]">Andrés Montero <span className="text-slate-900">Joyería</span></h1>
+                        <h1 className="text-xl font-bold tracking-tight text-[#80854b]">Miri Montero <span className="text-slate-900">Joyería</span></h1>
                     </div>
                 </div>
 
@@ -63,6 +64,10 @@ export const Layout = () => {
                         </NavLink>
                     ))}
                 </nav>
+
+                <div className="px-4 pb-2">
+                    <OnlineStatus />
+                </div>
 
                 <div className="p-4 border-t border-slate-100 pb-safe">
                     <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -96,7 +101,7 @@ export const Layout = () => {
                 <div className="flex-1 overflow-y-auto w-full mx-auto">
                     {/* Header Mobile Opcional */}
                     <div className="md:hidden sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-10 px-4 py-3 flex justify-between items-center pt-safe">
-                        <h1 className="text-lg font-bold text-slate-900 tracking-tight">Andrés Montero Joyería</h1>
+                        <h1 className="text-lg font-bold text-slate-900 tracking-tight">Miri Montero Joyería</h1>
                         <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm cursor-pointer"
                             style={{ backgroundColor: vendedorActual?.color_identificador || '#64748B' }}
