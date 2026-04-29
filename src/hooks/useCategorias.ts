@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { api } from '../lib/apiClient';
 import { db } from '../lib/db';
 import { Categoria } from '../types';
 
@@ -12,12 +11,7 @@ export const useCategorias = () => {
         try {
             setLoading(true);
             let data: Categoria[];
-            if (navigator.onLine) {
-                data = await api.categorias.list() as Categoria[];
-                await db.categorias.bulkPut(data);
-            } else {
-                data = await db.categorias.orderBy('orden_visual').toArray();
-            }
+            data = await db.categorias.orderBy('orden_visual').toArray();
             setCategorias(data);
             return data;
         } catch (err: any) {
@@ -35,7 +29,6 @@ export const useCategorias = () => {
             setLoading(true);
             const newId = crypto.randomUUID();
             const newCat = { ...categoria, id: newId };
-            await api.categorias.create(newCat);
             await db.categorias.add(newCat);
             await fetchCategorias();
             return { success: true, data: newCat };
@@ -49,7 +42,6 @@ export const useCategorias = () => {
     const actualizarCategoria = useCallback(async (id: string, cambios: Partial<Categoria>) => {
         try {
             setLoading(true);
-            await api.categorias.update(id, cambios);
             await db.categorias.update(id, cambios);
             await fetchCategorias();
             return { success: true };
@@ -63,7 +55,6 @@ export const useCategorias = () => {
     const eliminarCategoria = useCallback(async (id: string) => {
         try {
             setLoading(true);
-            await api.categorias.delete(id);
             await db.categorias.delete(id);
             await fetchCategorias();
             return { success: true };

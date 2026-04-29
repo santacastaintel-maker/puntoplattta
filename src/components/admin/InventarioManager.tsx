@@ -62,6 +62,7 @@ export const InventarioManager = () => {
     const [labelQuantities, setLabelQuantities] = useState<Record<string, number>>({});
     const [bulkLabelCopies, setBulkLabelCopies] = useState<number>(1);
     const [printMode, setPrintMode] = useState<'hoja' | 'rollo'>('hoja');
+    const [labelSize, setLabelSize] = useState<'chica' | 'grande'>('chica');
     const [showPrintModal, setShowPrintModal] = useState(false);
 
     const fetchProductos = async () => {
@@ -160,19 +161,15 @@ export const InventarioManager = () => {
 
         try {
             const resized = await resizeImage(file, 400, 400, 0.8);
-            // Convert blob to base64 for local storage
+            
             const reader = new FileReader();
             reader.onloadend = () => {
                 setForm(prev => ({ ...prev, foto_url: reader.result as string }));
             };
             reader.readAsDataURL(resized);
         } catch (err) {
-            // Fallback: read original
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setForm(prev => ({ ...prev, foto_url: reader.result as string }));
-            };
-            reader.readAsDataURL(file);
+            alert('Error al procesar la imagen');
+            console.error(err);
         }
     };
 
@@ -187,31 +184,24 @@ export const InventarioManager = () => {
         }
 
         try {
+            const payload = {
+                codigo: form.codigo,
+                nombre: form.nombre,
+                descripcion: form.descripcion || null,
+                categoria_id: form.categoria_id || null,
+                precio: form.precio,
+                stock: form.stock,
+                foto_url: form.foto_url || null, // Guardamos la URL o el base64
+                foto_key: form.foto_url?.includes('/api/image?key=') ? new URLSearchParams(form.foto_url.split('?')[1]).get('key') : null,
+                marca: form.marca || null,
+            };
+
             if (editingId) {
-                await db.productos.update(editingId, {
-                    codigo: form.codigo,
-                    nombre: form.nombre,
-                    descripcion: form.descripcion || null,
-                    categoria_id: form.categoria_id || null,
-                    precio: form.precio,
-                    stock: form.stock,
-                    foto_url: form.foto_url || null,
-                    marca: form.marca || null,
-                });
+                await db.productos.update(editingId, payload);
             } else {
-                await db.productos.add({
-                    id: crypto.randomUUID(),
-                    codigo: form.codigo,
-                    nombre: form.nombre,
-                    descripcion: form.descripcion || null,
-                    categoria_id: form.categoria_id || null,
-                    precio: form.precio,
-                    stock: form.stock,
-                    foto_url: form.foto_url || null,
-                    palabras_clave: null,
-                    activo: true,
-                    marca: form.marca || null,
-                });
+                const newId = crypto.randomUUID();
+                const newProduct = { id: newId, ...payload, activo: true, palabras_clave: null };
+                await db.productos.add(newProduct as any);
             }
             setShowForm(false);
             fetchProductos();
@@ -314,10 +304,16 @@ export const InventarioManager = () => {
     };
 
     const handleDownloadRolloPDF = async () => {
+        // Configuraciones según el tamaño elegido
+        const config = {
+            grande: { width: 100, height: 50, printableWidth: 60, barcodeHeight: 12, marginL: 5, marginT: 5 },
+            chica: { width: 60, height: 30, printableWidth: 35, barcodeHeight: 8, marginL: 2.5, marginT: 4.3 }
+        }[labelSize];
+
         const doc = new jsPDF({
             orientation: 'landscape',
             unit: 'mm',
-            format: [60, 11]
+            format: [config.width, config.height]
         });
 
         const selectedProducts = productos.filter(p => selectedForLabels.includes(p.id));
@@ -328,39 +324,45 @@ export const InventarioManager = () => {
             const copies = labelQuantities[p.id] || 1;
             for (let i = 0; i < copies; i++) {
                 if (!isFirstPage) {
-                    doc.addPage([60, 11], 'landscape');
+                    doc.addPage([config.width, config.height], 'landscape');
                 }
                 isFirstPage = false;
 
-                // 1. Nombre (Arriba centrado en los 15mm)
-                doc.setFontSize(5);
+                // 1. SKU (Arriba)
+                doc.setFontSize(labelSize === 'grande' ? 10 : 6);
+                doc.setFont("helvetica", "bold");
                 doc.setTextColor(51, 65, 85);
-                const shortName = p.nombre.length > 20 ? p.nombre.substring(0, 18) + '..' : p.nombre;
-                doc.text(shortName.toUpperCase(), 7.5, 2.2, { align: 'center' });
+                const skuText = `SKU: ${p.codigo.toUpperCase()}`;
+                doc.text(skuText, config.marginL, config.marginT + (labelSize === 'grande' ? 2 : 1));
 
-                // 2. Código de Barras (Centro de los 15mm)
+                // 2. Código de Barras
                 JsBarcode(canvas, p.codigo.toUpperCase(), {
                     format: "CODE128",
-                    width: 2,
-                    height: 40,
-                    displayValue: true,
-                    fontSize: 16,
+                    width: labelSize === 'grande' ? 3 : 2,
+                    height: 60, // Altura interna del canvas
+                    displayValue: false, // El valor lo ponemos nosotros con fuente controlada
                     margin: 0
                 });
                 const barcodeImg = canvas.toDataURL("image/png");
-                doc.addImage(barcodeImg, 'PNG', 1, 3, 13, 5);
+                
+                // Posicionamos el barcode abajo del SKU
+                const barcodeY = config.marginT + (labelSize === 'grande' ? 6 : 4);
+                doc.addImage(barcodeImg, 'PNG', config.marginL, barcodeY, config.printableWidth - 10, config.barcodeHeight);
 
-                // 3. Precio (Abajo centrado en los 15mm)
-                doc.setFontSize(7);
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(128, 133, 75);
-                doc.text(`$${p.precio.toFixed(2)}`, 7.5, 10, { align: 'center' });
-
-                // El resto (15mm a 60mm) queda blanco
+                // 3. Precio
+                doc.setFontSize(labelSize === 'grande' ? 14 : 9);
+                doc.setFont("helvetica", "black");
+                doc.setTextColor(128, 133, 75); // Color Olivo
+                const precioY = barcodeY + config.barcodeHeight + (labelSize === 'grande' ? 8 : 6);
+                
+                // Solo imprimimos el precio si cabe en el área imprimible
+                if (precioY < config.height - 2) {
+                    doc.text(`$${p.precio.toFixed(2)} MXN`, config.marginL, precioY);
+                }
             }
         });
 
-        doc.save(`Etiquetas_Joyeria_${Date.now()}.pdf`);
+        doc.save(`Etiquetas_${labelSize.toUpperCase()}_${Date.now()}.pdf`);
     };
 
     return (
@@ -775,6 +777,32 @@ export const InventarioManager = () => {
                                     </button>
                                 </div>
                             </div>
+
+                            {printMode === 'rollo' && (
+                                <div className="flex flex-col gap-2 bg-olivo-50/50 p-2 rounded-2xl border border-olivo-100">
+                                    <span className="text-[10px] font-black text-olivo-400 uppercase px-2 tracking-wider">Tamaño del Rollo</span>
+                                    <div className="flex bg-white/50 p-1 rounded-xl">
+                                        <button 
+                                            onClick={() => setLabelSize('chica')}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all", 
+                                                labelSize === 'chica' ? "bg-olivo-500 text-white shadow-sm" : "text-slate-400 hover:bg-white"
+                                            )}
+                                        >
+                                            Chica (60x30)
+                                        </button>
+                                        <button 
+                                            onClick={() => setLabelSize('grande')}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all", 
+                                                labelSize === 'grande' ? "bg-olivo-500 text-white shadow-sm" : "text-slate-400 hover:bg-white"
+                                            )}
+                                        >
+                                            Grande (100x50)
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
                                 <span className="text-xs font-bold text-slate-500 uppercase px-2">Copias rápidas:</span>
                                 <input 
@@ -876,7 +904,7 @@ export const InventarioManager = () => {
                                     className="flex-1 py-3 bg-olivo-600 hover:bg-olivo-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg"
                                 >
                                     <FileSpreadsheet className="w-5 h-5" />
-                                    Descargar PDF para Rollo (60x11mm)
+                                    Descargar PDF ({labelSize === 'grande' ? '100x50' : '60x30'})
                                 </button>
                             ) : (
                                 <button

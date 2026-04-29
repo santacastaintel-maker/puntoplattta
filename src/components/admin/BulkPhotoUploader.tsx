@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback } from 'react';
 import { X, Upload, FolderOpen, Check, Edit3, Trash2, Loader2, FileImage } from 'lucide-react';
 import { resizeImage } from '../../utils/mediaUtils';
 import { db } from '../../lib/db';
-
 interface PendingPhoto {
     id: string;
     file: File;
@@ -149,26 +148,26 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
             for (let i = 0; i < pendingPhotos.length; i++) {
                 const photo = pendingPhotos[i];
 
-                // Resize the image
-                let base64 = '';
+                let fotoUrl = '';
                 try {
                     const resized = await resizeImage(photo.file, 400, 400, 0.8);
-                    base64 = await new Promise<string>((resolve) => {
+                    
+                    fotoUrl = await new Promise<string>((resolve) => {
                         const reader = new FileReader();
                         reader.onloadend = () => resolve(reader.result as string);
                         reader.readAsDataURL(resized);
                     });
                 } catch {
-                    // Fallback: read original
-                    base64 = await new Promise<string>((resolve) => {
+                    // Fallback extremo a base64 original si falla resize
+                    fotoUrl = await new Promise<string>((resolve) => {
                         const reader = new FileReader();
                         reader.onloadend = () => resolve(reader.result as string);
                         reader.readAsDataURL(photo.file);
                     });
                 }
 
-                // Create product in DB
-                await db.productos.add({
+                // Create product payload
+                const payload = {
                     id: crypto.randomUUID(),
                     codigo: photo.codigo,
                     nombre: photo.nombre,
@@ -176,11 +175,14 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
                     categoria_id: photo.categoria_id || null,
                     precio: photo.precio,
                     stock: photo.stock,
-                    foto_url: base64,
+                    foto_url: fotoUrl,
+                    foto_key: fotoUrl.includes('/api/image?key=') ? new URLSearchParams(fotoUrl.split('?')[1]).get('key') : null,
                     palabras_clave: null,
                     activo: true,
                     marca: photo.marca || null,
-                });
+                };
+
+                await db.productos.add(payload as any);
 
                 setSavedCount(i + 1);
             }

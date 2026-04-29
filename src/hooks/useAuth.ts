@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Vendedor } from '../types';
 import { db } from '../lib/db';
-import { api } from '../lib/apiClient';
-
 interface AuthResponse {
     success: boolean;
     vendedor?: Vendedor;
@@ -24,20 +22,8 @@ export const useAuth = () => {
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Sincronizar vendedores desde Turso al arrancar (si hay internet)
+    // Sin sincronización de red.
     useEffect(() => {
-        const syncVendedores = async () => {
-            if (navigator.onLine) {
-                try {
-                    const fromCloud = await api.vendedores.list();
-                    // Guardar en Dexie para uso offline
-                    await db.vendedores.bulkPut(fromCloud.map((v: any) => ({ ...v, activo: v.activo })));
-                } catch {
-                    // Si falla la sync, no bloqueamos — usamos los datos locales
-                }
-            }
-        };
-        syncVendedores();
     }, []);
 
     useEffect(() => {
@@ -111,10 +97,7 @@ export const useAuth = () => {
             if (!vend) return { success: false, error: 'Usuario no existe' };
             if (vend.pin_auth !== pinActual) return { success: false, error: 'El PIN actual es incorrecto' };
 
-            // Actualizar en Turso + Dexie
-            if (navigator.onLine) {
-                await api.vendedores.update(vendedorActual.id, { pin_auth: pinNuevo });
-            }
+            // Actualizar solo en Dexie local
             await db.vendedores.update(vendedorActual.id, { pin_auth: pinNuevo });
             return { success: true, message: 'PIN actualizado correctamente' };
         } catch (error: any) {

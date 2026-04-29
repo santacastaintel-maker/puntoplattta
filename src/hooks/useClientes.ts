@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { api } from '../lib/apiClient';
 import { db } from '../lib/db';
 import { Cliente } from '../types';
 
@@ -13,20 +12,16 @@ export const useClientes = () => {
             setLoading(true);
             setError(null);
             let data: Cliente[];
-            if (navigator.onLine) {
-                data = await api.clientes.list(query) as Cliente[];
-            } else {
-                data = await db.clientes.toArray();
-                if (query) {
-                    const lq = query.toLowerCase();
-                    data = data.filter(c =>
-                        c.nombre.toLowerCase().includes(lq) ||
-                        (c.telefono && c.telefono.includes(query))
-                    );
-                }
-                data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                data = data.slice(0, 20);
+            data = await db.clientes.toArray();
+            if (query) {
+                const lq = query.toLowerCase();
+                data = data.filter(c =>
+                    c.nombre.toLowerCase().includes(lq) ||
+                    (c.telefono && c.telefono.includes(query))
+                );
             }
+            data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            data = data.slice(0, 20);
             setClientes(data);
             return data;
         } catch (err: any) {
@@ -40,9 +35,6 @@ export const useClientes = () => {
     const getClienteById = useCallback(async (id: string) => {
         try {
             setLoading(true);
-            if (navigator.onLine) {
-                return await api.clientes.get(id) as Cliente;
-            }
             return await db.clientes.get(id) || null;
         } catch (err: any) {
             setError(err.message);
@@ -56,7 +48,19 @@ export const useClientes = () => {
         try {
             setLoading(true);
             setError(null);
-            const cliente = await api.clientes.create(payload) as Cliente;
+            const cliente: Cliente = {
+                id: crypto.randomUUID(),
+                nombre: payload.nombre,
+                telefono: payload.telefono || null,
+                email: payload.email || null,
+                tipo_cliente: 'normal',
+                notas: null,
+                total_compras: 0,
+                numero_compras: 0,
+                apartados_pendientes: 0,
+                cancelaciones: 0,
+                created_at: new Date().toISOString()
+            };
             await db.clientes.put(cliente);
             return cliente;
         } catch (err: any) {
@@ -70,9 +74,6 @@ export const useClientes = () => {
     const getHistorialCliente = useCallback(async (id: string) => {
         try {
             setLoading(true);
-            if (navigator.onLine) {
-                return await api.clientes.historial(id);
-            }
             const ventas = await db.ventas.where('cliente_id').equals(id).toArray();
             return ventas.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         } catch (err: any) {

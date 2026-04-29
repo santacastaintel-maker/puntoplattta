@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { api } from '../lib/apiClient';
 import { db } from '../lib/db';
 import { NuevaVentaPayload, Venta, FiltroVentas } from '../types';
 
@@ -13,27 +12,18 @@ export const useVentas = (_token?: string | null) => {
             setLoading(true);
             setError(null);
             let data: Venta[];
-            if (navigator.onLine) {
-                data = await api.ventas.list(vendedorId, {
-                    fecha_desde: filtros.fecha_desde,
-                    fecha_hasta: filtros.fecha_hasta,
-                    sesion_id: filtros.sesion_id,
-                }) as Venta[];
-            } else {
-                // Fallback offline
-                let q = db.ventas.where('vendedor_id').equals(vendedorId);
-                data = await q.toArray();
-                if (filtros.sesion_id) data = data.filter(v => v.sesion_id === filtros.sesion_id);
-                if (filtros.fecha_desde) {
-                    const desde = new Date(filtros.fecha_desde).getTime();
-                    data = data.filter(v => new Date(v.created_at).getTime() >= desde);
-                }
-                if (filtros.fecha_hasta) {
-                    const hasta = new Date(filtros.fecha_hasta).getTime() + 86400000;
-                    data = data.filter(v => new Date(v.created_at).getTime() < hasta);
-                }
-                data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            let q = db.ventas.where('vendedor_id').equals(vendedorId);
+            data = await q.toArray();
+            if (filtros.sesion_id) data = data.filter(v => v.sesion_id === filtros.sesion_id);
+            if (filtros.fecha_desde) {
+                const desde = new Date(filtros.fecha_desde).getTime();
+                data = data.filter(v => new Date(v.created_at).getTime() >= desde);
             }
+            if (filtros.fecha_hasta) {
+                const hasta = new Date(filtros.fecha_hasta).getTime() + 86400000;
+                data = data.filter(v => new Date(v.created_at).getTime() < hasta);
+            }
+            data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
             setVentas(data);
             return data;
         } catch (err: any) {
@@ -48,11 +38,9 @@ export const useVentas = (_token?: string | null) => {
         try {
             setLoading(true);
             setError(null);
-            const result = await api.ventas.create(payload);
-            // También guardar en Dexie para historial offline
             const nuevaVenta: Venta = {
-                id: result.id,
-                folio: result.folio,
+                id: crypto.randomUUID(),
+                folio: `V-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`,
                 sesion_id: payload.sesion_id,
                 vendedor_id: payload.vendedor_id,
                 cliente_id: payload.cliente_id,
@@ -61,9 +49,9 @@ export const useVentas = (_token?: string | null) => {
                 total: payload.total,
                 monto_abonado: (payload as any).monto_abonado || payload.total,
                 metodo_pago: payload.metodo_pago,
-                estado: result.estado || 'completada',
+                estado: 'completada',
                 notas: payload.notas || null,
-                created_at: result.created_at || new Date().toISOString(),
+                created_at: new Date().toISOString(),
             };
             await db.ventas.put(nuevaVenta);
             return nuevaVenta;
@@ -79,7 +67,6 @@ export const useVentas = (_token?: string | null) => {
         try {
             setLoading(true);
             setError(null);
-            await api.ventas.cancelar(ventaId);
             await db.ventas.update(ventaId, { estado: 'cancelada' });
             setVentas(prev => prev.map(v => v.id === ventaId ? { ...v, estado: 'cancelada' } : v));
             return { id: ventaId };

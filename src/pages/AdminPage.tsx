@@ -73,6 +73,7 @@ export const AdminPage = () => {
     const [multiplierParams, setMultiplierParams] = useState<number>(1.00);
     const [isProcessing, setIsProcessing] = useState(false);
 
+
     const handleGenerateKey = (e: React.FormEvent) => {
         e.preventDefault();
         if (!businessName.trim()) return;
@@ -620,6 +621,8 @@ export const AdminPage = () => {
                                 </label>
                             </div>
                         </div>
+
+
 
                     </div>
                 )}
