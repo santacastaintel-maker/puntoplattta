@@ -50,8 +50,8 @@ export const BulkPhotoUploader: React.FC<Props> = ({ open, onClose, categorias, 
 
     // ── Generate SKU ──
     const generateSKU = async (prefix: string, index: number): Promise<string> => {
-        const cleanPrefix = prefix.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6);
-        return `${cleanPrefix || 'PP'}-${String(index).padStart(3, '0')}`;
+        const cleanPrefix = prefix.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 3);
+        return `${cleanPrefix || 'AM'}${String(index).padStart(3, '0')}`;
     };
 
     // ── Process files into PendingPhoto list ──

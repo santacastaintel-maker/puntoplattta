@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
-import JsBarcode from 'jsbarcode';
+import QRCode from 'qrcode';
 import { Plus, Search, Edit3, Trash2, Save, X, Image, Package, Tag, Upload, FileSpreadsheet, Printer, CheckSquare, Square, LayoutGrid, ScrollText } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { BarcodeLabel } from './BarcodeLabel';
@@ -62,7 +62,7 @@ export const InventarioManager = () => {
     const [labelQuantities, setLabelQuantities] = useState<Record<string, number>>({});
     const [bulkLabelCopies, setBulkLabelCopies] = useState<number>(1);
     const [printMode, setPrintMode] = useState<'hoja' | 'rollo'>('hoja');
-    const [labelSize, setLabelSize] = useState<'chica' | 'grande'>('chica');
+
     const [showPrintModal, setShowPrintModal] = useState(false);
 
     const fetchProductos = async () => {
@@ -127,8 +127,10 @@ export const InventarioManager = () => {
     }, [showForm, showCatModal, showBulkUploader, showPrintModal]);
 
     const handleOpenNew = () => {
+        // Generar un ID corto aleatorio (4 caracteres base 36)
+        const shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
         setEditingId(null);
-        setForm({ ...EMPTY_FORM, codigo: `PP-${Date.now().toString(36).toUpperCase()}` });
+        setForm({ ...EMPTY_FORM, codigo: `AM-${shortId}` });
         setFormError('');
         setShowForm(true);
     };
@@ -245,7 +247,7 @@ export const InventarioManager = () => {
                                 return null;
                             };
 
-                            const codigo = (findVal(['Codigo', 'codigo', 'SKU', 'sku', 'ID', 'id', 'Ref', 'ref']) || `PP-EX-${Date.now().toString(36)}-${importCount}`).toString();
+                            const codigo = (findVal(['Codigo', 'codigo', 'SKU', 'sku', 'ID', 'id', 'Ref', 'ref']) || `AM-${Math.random().toString(36).substring(2, 6).toUpperCase()}`).toString();
                             const nombre = (findVal(['Nombre', 'nombre', 'Producto', 'producto', 'Articulo', 'articulo']) || 'Producto sin nombre').toString();
                             const precioVal = findVal(['Precio', 'precio', 'Costo', 'costo', 'Valor', 'valor', 'Importe', 'importe']);
                             const stockVal = findVal(['Stock', 'stock', 'Existencia', 'existencia', 'Cantidad', 'cantidad', 'Cant', 'cant', 'Piezas', 'piezas', 'Pzas', 'pzas', 'Qty', 'qty']);
@@ -303,66 +305,186 @@ export const InventarioManager = () => {
         return categorias.find(c => c.id === catId)?.nombre || 'Sin categoría';
     };
 
+    const handleExportBarTender = () => {
+        try {
+            console.log('Iniciando exportación BarTender...');
+            const selectedProducts = productos.filter(p => selectedForLabels.includes(p.id));
+            
+            if (selectedProducts.length === 0) {
+                alert('No hay productos seleccionados para exportar. Por favor, selecciona al menos uno en la lista.');
+                return;
+            }
+
+            const excelData: any[] = [];
+            selectedProducts.forEach(p => {
+                const copies = labelQuantities[p.id] || 1;
+                for (let i = 0; i < copies; i++) {
+                    excelData.push({
+                        SKU: p.codigo.toUpperCase(),
+                        Nombre: p.nombre,
+                        Precio: p.precio,
+                        PrecioEtiqueta: `$${p.precio % 1 === 0 ? p.precio.toFixed(0) : p.precio.toFixed(2)}`
+                    });
+                }
+            });
+
+            if (excelData.length === 0) {
+                alert('No se generaron datos para el Excel. Verifica las cantidades.');
+                return;
+            }
+
+            console.log('Generando archivo con', excelData.length, 'filas...');
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Etiquetas BarTender");
+            
+            // Método de descarga manual para mayor compatibilidad
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'BarTender_Export_1777681081602.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            console.log('Descarga iniciada manualmente.');
+        } catch (error) {
+            console.error('Error en exportación BarTender:', error);
+            alert('Error técnico al generar el Excel: ' + (error as Error).message);
+        }
+    };
+
     const handleDownloadRolloPDF = async () => {
-        // Configuraciones según el tamaño elegido
-        const config = {
-            grande: { width: 100, height: 50, printableWidth: 60, barcodeHeight: 12, marginL: 5, marginT: 5 },
-            chica: { width: 60, height: 30, printableWidth: 35, barcodeHeight: 8, marginL: 2.5, marginT: 4.3 }
-        }[labelSize];
+        // ── Medidas reales de la etiqueta ──────────────────────────────
+        //   62 mm de ancho × 10.8 mm de alto (landscape)
+        //   Sección 1 (  0 – 14.2 mm): PRECIO grande
+        //   Sección 2 ( 14.2 – 28.4 mm): Código de barras
+        //   Sección 3 ( 28.4 – 62 mm ): SKU grande
+        //
+        // Estrategia: dibujamos TODO en un canvas de alta resolución
+        // y lo insertamos como PNG. Así la impresora siempre obtiene
+        // texto nítido, sin importar cómo interprete el PDF.
+        // ──────────────────────────────────────────────────────────────
+
+        const W_MM = 62;
+        const H_MM = 10.8;
+        const DPI  = 300;                          // resolución objetivo
+        const PX_PER_MM = DPI / 25.4;             // ≈ 11.81 px/mm
+        const CW   = Math.round(W_MM * PX_PER_MM); // 733 px
+        const CH   = Math.round(H_MM * PX_PER_MM); // 128 px
+
+        // Divisiones en píxeles
+        const Q1_END = Math.round(14.2 * PX_PER_MM);   // fin sección precio
+        const Q2_END = Math.round(28.4 * PX_PER_MM);   // fin sección barcode
 
         const doc = new jsPDF({
             orientation: 'landscape',
             unit: 'mm',
-            format: [config.width, config.height]
+            format: [W_MM, H_MM]
         });
 
         const selectedProducts = productos.filter(p => selectedForLabels.includes(p.id));
         let isFirstPage = true;
-        const canvas = document.createElement('canvas');
 
-        selectedProducts.forEach(p => {
+        // Reutilizamos barcodeCanvas para JsBarcode (el canvas declarado arriba)
+        const barcodeCanvas = document.createElement('canvas');
+        const labelCanvas   = document.createElement('canvas');
+        labelCanvas.width   = CW;
+        labelCanvas.height  = CH;
+        const ctx = labelCanvas.getContext('2d')!;
+
+        for (const p of selectedProducts) {
             const copies = labelQuantities[p.id] || 1;
             for (let i = 0; i < copies; i++) {
-                if (!isFirstPage) {
-                    doc.addPage([config.width, config.height], 'landscape');
-                }
+                if (!isFirstPage) doc.addPage([W_MM, H_MM], 'landscape');
                 isFirstPage = false;
 
-                // 1. SKU (Arriba)
-                doc.setFontSize(labelSize === 'grande' ? 10 : 6);
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(51, 65, 85);
-                const skuText = `SKU: ${p.codigo.toUpperCase()}`;
-                doc.text(skuText, config.marginL, config.marginT + (labelSize === 'grande' ? 2 : 1));
+                // ── Limpiar canvas ──────────────────────────────────────
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, CW, CH);
 
-                // 2. Código de Barras
-                JsBarcode(canvas, p.codigo.toUpperCase(), {
-                    format: "CODE128",
-                    width: labelSize === 'grande' ? 3 : 2,
-                    height: 60, // Altura interna del canvas
-                    displayValue: false, // El valor lo ponemos nosotros con fuente controlada
-                    margin: 0
-                });
-                const barcodeImg = canvas.toDataURL("image/png");
-                
-                // Posicionamos el barcode abajo del SKU
-                const barcodeY = config.marginT + (labelSize === 'grande' ? 6 : 4);
-                doc.addImage(barcodeImg, 'PNG', config.marginL, barcodeY, config.printableWidth - 10, config.barcodeHeight);
+                const PAD = Math.round(2 * PX_PER_MM); // 2mm de padding interno
 
-                // 3. Precio
-                doc.setFontSize(labelSize === 'grande' ? 14 : 9);
-                doc.setFont("helvetica", "black");
-                doc.setTextColor(128, 133, 75); // Color Olivo
-                const precioY = barcodeY + config.barcodeHeight + (labelSize === 'grande' ? 8 : 6);
-                
-                // Solo imprimimos el precio si cabe en el área imprimible
-                if (precioY < config.height - 2) {
-                    doc.text(`$${p.precio.toFixed(2)} MXN`, config.marginL, precioY);
+                // ══════════════════════════════════════════════════════
+                // SECCIÓN 1 (0 – Q1_END): PRECIO
+                // ══════════════════════════════════════════════════════
+                const sec1W = Q1_END;
+                const precioText = `$${p.precio % 1 === 0 ? p.precio.toFixed(0) : p.precio.toFixed(2)}`;
+
+                // Calcular tamaño de fuente que llene ~80% del ancho de la sección
+                let fontSize = CH * 0.55; // empezamos por la altura
+                ctx.font = `900 ${fontSize}px Arial, sans-serif`;
+                while (ctx.measureText(precioText).width > sec1W - PAD * 2 && fontSize > 10) {
+                    fontSize -= 1;
+                    ctx.font = `900 ${fontSize}px Arial, sans-serif`;
                 }
-            }
-        });
 
-        doc.save(`Etiquetas_${labelSize.toUpperCase()}_${Date.now()}.pdf`);
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = `900 ${fontSize}px Arial, sans-serif`;
+                ctx.fillText(precioText, sec1W / 2, CH / 2);
+
+                // ══════════════════════════════════════════════════════
+                // SECCIÓN 2 (Q1_END – Q2_END): BARCODE (arriba) + SKU (abajo)
+                // Exactamente como en la foto "finals"
+                // ══════════════════════════════════════════════════════
+                const sec2W  = Q2_END - Q1_END;
+                const sec2X  = Q1_END;
+                const PAD2   = Math.round(1 * PX_PER_MM); // 1mm padding sección 2
+
+                // Dividir verticalmente: barcode = 65% alto, SKU = 35% alto
+                const barcodeAreaH = Math.round(CH * 0.60);
+                const skuAreaH     = CH - barcodeAreaH;
+
+                // --- QR Code en la zona superior de sección 2 ---
+                const qrSize = Math.min(sec2W - PAD2 * 2, barcodeAreaH - PAD2 * 2);
+                await QRCode.toCanvas(barcodeCanvas, p.codigo.toUpperCase(), {
+                    width: qrSize,
+                    margin: 0,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                });
+                
+                // Centrar el QR horizontalmente en su sección
+                const qrXOffset = (sec2W - qrSize) / 2;
+                ctx.drawImage(
+                    barcodeCanvas,
+                    sec2X + qrXOffset, PAD2,
+                    qrSize, qrSize
+                );
+
+                // --- SKU en la zona inferior de sección 2 ---
+                const skuText = p.codigo.toUpperCase();
+                let skuFontSize = skuAreaH * 0.80; // empezamos por la altura del área
+                ctx.font = `bold ${skuFontSize}px Arial, sans-serif`;
+                while (ctx.measureText(skuText).width > sec2W - PAD2 * 2 && skuFontSize > 6) {
+                    skuFontSize -= 1;
+                    ctx.font = `bold ${skuFontSize}px Arial, sans-serif`;
+                }
+                ctx.fillStyle    = '#000000';
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(skuText, sec2X + sec2W / 2, barcodeAreaH + skuAreaH / 2);
+
+                // SECCIÓN 3: en blanco (ya limpiamos el canvas con fillRect blanco al inicio)
+
+                // ── Insertar el canvas completo como imagen en el PDF ──
+                const imgData = labelCanvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 0, 0, W_MM, H_MM);
+            }
+        }
+
+        doc.save(`Etiquetas_AMJ_${Date.now()}.pdf`);
     };
 
     return (
@@ -778,31 +900,7 @@ export const InventarioManager = () => {
                                 </div>
                             </div>
 
-                            {printMode === 'rollo' && (
-                                <div className="flex flex-col gap-2 bg-olivo-50/50 p-2 rounded-2xl border border-olivo-100">
-                                    <span className="text-[10px] font-black text-olivo-400 uppercase px-2 tracking-wider">Tamaño del Rollo</span>
-                                    <div className="flex bg-white/50 p-1 rounded-xl">
-                                        <button 
-                                            onClick={() => setLabelSize('chica')}
-                                            className={cn(
-                                                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all", 
-                                                labelSize === 'chica' ? "bg-olivo-500 text-white shadow-sm" : "text-slate-400 hover:bg-white"
-                                            )}
-                                        >
-                                            Chica (60x30)
-                                        </button>
-                                        <button 
-                                            onClick={() => setLabelSize('grande')}
-                                            className={cn(
-                                                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all", 
-                                                labelSize === 'grande' ? "bg-olivo-500 text-white shadow-sm" : "text-slate-400 hover:bg-white"
-                                            )}
-                                        >
-                                            Grande (100x50)
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                            {/* Selector de tamaño eliminado por petición del usuario: Solo se usan etiquetas chicas de 62x10.8 */}
                             <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
                                 <span className="text-xs font-bold text-slate-500 uppercase px-2">Copias rápidas:</span>
                                 <input 
@@ -899,13 +997,22 @@ export const InventarioManager = () => {
                                 Limpiar Selección
                             </button>
                             {printMode === 'rollo' ? (
-                                <button
-                                    onClick={handleDownloadRolloPDF}
-                                    className="flex-1 py-3 bg-olivo-600 hover:bg-olivo-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg"
-                                >
-                                    <FileSpreadsheet className="w-5 h-5" />
-                                    Descargar PDF ({labelSize === 'grande' ? '100x50' : '60x30'})
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleExportBarTender}
+                                        className="flex-1 py-3 bg-[#80854b] hover:bg-[#64683a] text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg"
+                                    >
+                                        <FileSpreadsheet className="w-5 h-5" />
+                                        Exportar Excel (BarTender)
+                                    </button>
+                                    <button
+                                        onClick={handleDownloadRolloPDF}
+                                        className="flex-1 py-3 bg-olivo-600 hover:bg-olivo-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg"
+                                    >
+                                        <Printer className="w-5 h-5" />
+                                        Descargar PDF
+                                    </button>
+                                </>
                             ) : (
                                 <button
                                     onClick={() => window.print()}

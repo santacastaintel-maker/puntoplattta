@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Preview Etiqueta — Andrés Montero Joyería</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1e1e2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #cdd6f4;
+      gap: 32px;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #a6e3a1;
+    }
+    .card {
+      background: #313244;
+      border-radius: 20px;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    }
+    .label-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .label-title {
+      font-size: 11px;
+      color: #6c7086;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    canvas#labelCanvas {
+      border-radius: 4px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.6);
+      /* Mostramos a tamaño doble para que se vea bien en pantalla */
+      width: 733px;
+      height: 128px;
+    }
+    .dims {
+      font-size: 11px;
+      color: #6c7086;
+    }
+    .zone-labels {
+      display: flex;
+      width: 733px;
+      font-size: 10px;
+      color: #89b4fa;
+      text-align: center;
+    }
+    .zone-labels div { border-top: 2px dashed #45475a; padding-top: 4px; }
+    .zone1 { width: 167px; } /* 14.2/62 * 733 */
+    .zone2 { width: 167px; }
+    .zone3 { flex: 1; color: #45475a; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+    .ctrl {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ctrl label { font-size: 11px; color: #89b4fa; text-transform: uppercase; }
+    .ctrl input {
+      background: #1e1e2e;
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      color: #cdd6f4;
+      padding: 6px 12px;
+      font-size: 14px;
+      outline: none;
+      width: 180px;
+    }
+    .ctrl input:focus { border-color: #a6e3a1; }
+
+    .regenerate {
+      background: #a6e3a1;
+      color: #1e1e2e;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.2s;
+    }
+    .regenerate:hover { opacity: 0.85; }
+
+    .note {
+      font-size: 11px;
+      color: #6c7086;
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    .section-info {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pill {
+      font-size: 11px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .p1 { background: #f38ba844; color: #f38ba8; }
+    .p2 { background: #89dceb44; color: #89dceb; }
+    .p3 { background: #45475a; color: #6c7086; }
+  </style>
+</head>
+<body>
+
+<h1>🏷️ Preview Etiqueta Térmica — 62 × 10.8 mm</h1>
+
+<div class="card">
+
+  <div class="section-info">
+    <span class="pill p1">Sección 1 (0–14.2mm) → Precio</span>
+    <span class="pill p2">Sección 2 (14.2–28.4mm) → Barcode + SKU</span>
+    <span class="pill p3">Sección 3 (28.4–62mm) → En blanco</span>
+  </div>
+
+  <div class="label-wrapper">
+    <canvas id="labelCanvas" width="733" height="128"></canvas>
+    <div class="zone-labels">
+      <div class="zone1">💰 Precio</div>
+      <div class="zone2">📊 Barcode + SKU</div>
+      <div class="zone3">⬜ En blanco</div>
+    </div>
+    <p class="dims">Resolución interna: 733 × 128 px @ 300 DPI (equivale a 62 × 10.8 mm)</p>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Precio</label>
+      <input id="precioInput" type="number" value="1450" step="1" />
+    </div>
+    <div class="ctrl">
+      <label>Código SKU</label>
+      <input id="skuInput" type="text" value="AM-0023" maxlength="20" />
+    </div>
+  </div>
+
+  <button class="regenerate" onclick="renderLabel()">↻ Regenerar Etiqueta</button>
+
+  <p class="note">
+    Este preview usa el mismo código canvas que genera el PDF real. Lo que ves aquí
+    es exactamente lo que se manda a la impresora Ribetec.
+  </p>
+</div>
+
+<!-- Canvas oculto para JsBarcode -->
+<canvas id="barcodeCanvas" style="display:none"></canvas>
+
+<script>
+  // ── Dimensiones idénticas al código de producción ──
+  const W_MM      = 62;
+  const H_MM      = 10.8;
+  const DPI       = 300;
+  const PX_PER_MM = DPI / 25.4;          // ≈ 11.81 px/mm
+  const CW        = Math.round(W_MM * PX_PER_MM);  // 733 px
+  const CH        = Math.round(H_MM * PX_PER_MM);  // 128 px
+
+  const Q1_END = Math.round(14.2 * PX_PER_MM);   // fin sección 1 (precio)
+  const Q2_END = Math.round(28.4 * PX_PER_MM);   // fin sección 2 (barcode+sku)
+
+  function renderLabel() {
+    const precio  = parseFloat(document.getElementById('precioInput').value) || 1450;
+    const sku     = document.getElementById('skuInput').value.trim().toUpperCase() || 'AM-0023';
+
+    const labelCanvas   = document.getElementById('labelCanvas');
+    const barcodeCanvas = document.getElementById('barcodeCanvas');
+    const ctx = labelCanvas.getContext('2d');
+
+    // ── Limpiar ──────────────────────────────────────
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, CW, CH);
+
+    const PAD  = Math.round(2 * PX_PER_MM);  // 2mm padding sección 1
+
+    // ══════════════════════════════════════════════
+    // SECCIÓN 1: PRECIO (0 – Q1_END)
+    // ══════════════════════════════════════════════
+    const sec1W     = Q1_END;
+    const precioTxt = `$${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
+
+    let fs = CH * 0.55;
+    ctx.font = `900 ${fs}px Arial, sans-serif`;
+    while (ctx.measureText(precioTxt).width > sec1W - PAD * 2 && fs > 10) {
+      fs -= 1;
+      ctx.font = `900 ${fs}px Arial, sans-serif`;
+    }
+    ctx.fillStyle    = '#000000';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(precioTxt, sec1W / 2, CH / 2);
+
+    // ══════════════════════════════════════════════
+    // SECCIÓN 2: BARCODE (arriba) + SKU (abajo)
+    // ══════════════════════════════════════════════
+    const sec2W = Q2_END - Q1_END;
+    const sec2X = Q1_END;
+    const PAD2  = Math.round(1 * PX_PER_MM);   // 1mm padding sección 2
+
+    const barcodeAreaH = Math.round(CH * 0.60);
+    const skuAreaH     = CH - barcodeAreaH;
+
+    // Barcode
+    try {
+      JsBarcode(barcodeCanvas, sku, {
+        format:       'CODE128',
+        width:        2,
+        height:       barcodeAreaH - PAD2 * 2,
+        displayValue: false,
+        margin:       0,
+        background:   '#FFFFFF'
+      });
+      ctx.drawImage(barcodeCanvas, sec2X + PAD2, PAD2, sec2W - PAD2 * 2, barcodeAreaH - PAD2 * 2);
+    } catch(e) {
+      ctx.fillStyle = '#ff0000';
+      ctx.font = '14px Arial';
+      ctx.fillText('SKU inválido', sec2X + 4, barcodeAreaH / 2);
+    }
+
+    // SKU texto
+    let skuFS = skuAreaH * 0.80;
+    ctx.font = `bold ${skuFS}px Arial, sans-serif`;
+    while (ctx.measureText(sku).width > sec2W - PAD2 * 2 && skuFS > 6) {
+      skuFS -= 1;
+      ctx.font = `bold ${skuFS}px Arial, sans-serif`;
+    }
+    ctx.fillStyle    = '#000000';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(sku, sec2X + sec2W / 2, barcodeAreaH + skuAreaH / 2);
+
+    // Sección 3: en blanco (ya limpiamos)
+  }
+
+  // Renderizar al cargar
+  renderLabel();
+
+  // Actualizar en tiempo real
+  document.getElementById('precioInput').addEventListener('input', renderLabel);
+  document.getElementById('skuInput').addEventListener('input', renderLabel);
+</script>
+</body>
+</html>
