@@ -140,8 +140,8 @@ export const LicenseGuard = ({ children }: LicenseGuardProps) => {
                             <div>
                                 <div className="flex justify-between items-end mb-1">
                                     <label className="block text-sm font-semibold text-slate-700">Llave de Activación</label>
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={handlePasteKey}
                                         className="text-xs font-bold text-olivo-600 hover:text-olivo-700 flex items-center gap-1 bg-olivo-50 px-2 py-1 rounded-md transition-colors"
                                     >

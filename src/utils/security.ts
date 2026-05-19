@@ -3,14 +3,14 @@
 // Esta es la SAL SECRETA. Debe ser la misma que uses en tu generador portátil.
 const SECRET_SALT = 'WACHAMONOS-AGRADECIDO1234';
 
-export type LicenseType = 'mensual' | 'vitalicia';
+export type LicenseType = 'mensual' | 'vitalicia' | 'prueba';
 
 export interface LicenseData {
     key: string;
     businessName: string;
     type: LicenseType;
     generatedAt: number;
-    expiresAt?: number; // Solo para mensuales
+    expiresAt?: number; // Solo para mensuales y de prueba
 }
 
 // Función simple de hash (similar a Java String.hashCode) para evitar dependencias pesadas crypto en cliente
@@ -31,6 +31,9 @@ export const generateLicenseKey = (businessName: string, type: LicenseType): Lic
     if (type === 'mensual') {
         // 30 días en milisegundos
         expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
+    } else if (type === 'prueba') {
+        // 7 días en milisegundos
+        expiresAt = timestamp + (7 * 24 * 60 * 60 * 1000);
     }
 
     // El Hash se basa en: Nombre limpio + Tipo + Fecha + SAL
@@ -39,7 +42,11 @@ export const generateLicenseKey = (businessName: string, type: LicenseType): Lic
     const hashSignature = createHash(dataString).toString(16).toUpperCase();
 
     // Formato de llave: TIPO-HASH-FECHA(opcional)
-    const key = `PP-${type === 'vitalicia' ? 'VIT' : 'MES'}-${hashSignature}${expiresAt ? '-' + expiresAt.toString(36).toUpperCase() : ''}`;
+    let typeCode = 'MES';
+    if (type === 'vitalicia') typeCode = 'VIT';
+    if (type === 'prueba') typeCode = 'PRU';
+
+    const key = `PP-${typeCode}-${hashSignature}${expiresAt ? '-' + expiresAt.toString(36).toUpperCase() : ''}`;
 
     return {
         key,
@@ -65,13 +72,17 @@ export const validateLicenseKey = (key: string, expectedBusinessName: string): {
         const hashSignature = parts[2];
         const expiresStr = parts[3];
 
-        const type: LicenseType = typeCode === 'VIT' ? 'vitalicia' : 'mensual';
+        let type: LicenseType = 'mensual';
+        if (typeCode === 'VIT') type = 'vitalicia';
+        else if (typeCode === 'PRU') type = 'prueba';
+        else type = 'mensual';
+        
         let expiresAt: number | undefined = undefined;
 
-        if (type === 'mensual' && expiresStr) {
+        if ((type === 'mensual' || type === 'prueba') && expiresStr) {
             expiresAt = parseInt(expiresStr, 36);
             if (Date.now() > expiresAt) {
-                return { valid: false, reason: 'La licencia mensual ha expirado.' };
+                return { valid: false, reason: 'La licencia ha expirado.' };
             }
         }
 

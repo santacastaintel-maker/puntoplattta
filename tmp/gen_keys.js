@@ -21,6 +21,6 @@ const generateVitalicia = (businessName) => {
     return key;
 };
 
-console.log("Key for 'MIRI MONTERO JOYERIA':", generateVitalicia('MIRI MONTERO JOYERIA'));
-console.log("Key for 'MIRI MONTERO JOYERÍA':", generateVitalicia('MIRI MONTERO JOYERÍA'));
+console.log("Key for 'ANDRES MONTERO JOYERIA':", generateVitalicia('ANDRES MONTERO JOYERIA'));
+console.log("Key for 'ANDRES MONTERO JOYERÍA':", generateVitalicia('ANDRES MONTERO JOYERÍA'));
 console.log("Key for 'ANDRES MONTERO JOYERIA':", generateVitalicia('ANDRES MONTERO JOYERIA'));
