@@ -1,12 +1,44 @@
 
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Home, ShoppingCart, ListOrdered, Users, Settings, LogOut, BookOpen, Sparkles } from 'lucide-react';
+import { Home, ShoppingCart, ListOrdered, Users, Settings, LogOut, BookOpen, Sparkles, Download, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { OnlineStatus } from '../ui/OnlineStatus';
+import { useState, useEffect } from 'react';
 
 export const Layout = () => {
     const { vendedorActual, logout, isAdmin } = useAuth();
     const navigate = useNavigate();
+    const [showBackupReminder, setShowBackupReminder] = useState(false);
+
+    useEffect(() => {
+        const checkReminder = () => {
+            const lastReminder = localStorage.getItem('lastBackupReminder');
+            const now = new Date();
+            
+            if (!lastReminder) {
+                // Si nunca se ha mostrado, inicializamos para dentro de 3 días
+                localStorage.setItem('lastBackupReminder', now.getTime().toString());
+                return;
+            }
+
+            const lastTime = parseInt(lastReminder);
+            const daysPassed = (now.getTime() - lastTime) / (1000 * 60 * 60 * 24);
+
+            // Si han pasado 3 días o más y son las 6 PM o más tarde
+            if (daysPassed >= 3 && now.getHours() >= 18) {
+                setShowBackupReminder(true);
+            }
+        };
+
+        checkReminder();
+        const interval = setInterval(checkReminder, 1000 * 60 * 60); // Chequear cada hora
+        return () => clearInterval(interval);
+    }, []);
+
+    const dismissReminder = () => {
+        setShowBackupReminder(false);
+        localStorage.setItem('lastBackupReminder', new Date().getTime().toString());
+    };
 
     const handleLogout = () => {
         logout();
@@ -116,6 +148,30 @@ export const Layout = () => {
                         <Outlet />
                     </div>
                 </div>
+
+                {/* Toast de Recordatorio de Respaldo */}
+                {showBackupReminder && (
+                    <div className="absolute bottom-20 md:bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-800 p-4 z-50 animate-in slide-in-from-bottom-5 fade-in flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                            <Download className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 pt-0.5">
+                            <h4 className="font-bold text-sm">Sugerencia de Seguridad</h4>
+                            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                                Recuerda hacer un respaldo de tus datos. Ve al panel de <strong className="text-white">Admin {'>'} Herramientas</strong> y descarga tu copia de seguridad offline.
+                            </p>
+                            <button 
+                                onClick={dismissReminder}
+                                className="mt-3 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-wider"
+                            >
+                                Entendido
+                            </button>
+                        </div>
+                        <button onClick={dismissReminder} className="text-slate-400 hover:text-white transition-colors shrink-0">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                )}
             </main>
 
             {/* Bottom Nav Mobile */}
